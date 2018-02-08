@@ -17,7 +17,60 @@ PongPhysicsEngine::PongPhysicsEngine(double angle, double xMin, double yMin, dou
 }
 
 void PongPhysicsEngine::moveBall(double movementSpeed) {
-	//if (ballCoordinates.first > xMax || )
+	// Account for offsets for paddle sizes and ball size
+
+	double currentXMovement = movementSpeed * cos(ballAngle * PI / 180);
+	double currentYMovement = movementSpeed * sin(ballAngle * PI / 180);
+
+	// A Paddle
+	if (ballCoordinates.first == paddleCoordinates.first && ballCoordinates.second == paddleCoordinates.second) {
+		if (currentXMovement > 0) {
+			ballAngle += 90;
+		}
+		else {
+			ballAngle -= 90;
+		}
+	}
+
+	// Top Wall
+	if ((ballCoordinates.first < screenXMin || ballCoordinates.first > screenXMax) && ballCoordinates.second == screenYMin) {
+		if (currentXMovement > 0) {
+			ballAngle += 90;
+		}
+		else {
+			ballAngle -= 90;
+		}
+	}
+
+	// Bot Wall
+	if ((ballCoordinates.first < screenXMin || ballCoordinates.first > screenXMax) && ballCoordinates.second == screenYMax) {
+		if (currentXMovement > 0) {
+			ballAngle -= 90;
+		}
+		else {
+			ballAngle += 90;
+		}
+	}
+
+	// Left Wall
+	if (ballCoordinates.first == screenXMin && (ballCoordinates.second < screenYMin || ballCoordinates.second > screenYMax)) {
+		if (currentYMovement > 0) {
+			ballAngle += 90;
+		}
+		else {
+			ballAngle -= 90;
+		}
+	}
+
+	// Right Wall
+	if (ballCoordinates.first == screenXMax && (ballCoordinates.second < screenYMin || ballCoordinates.second > screenYMax)) {
+		if (currentYMovement > 0) {
+			ballAngle -= 90;
+		}
+		else {
+			ballAngle += 90;
+		}
+	}
 
 	ballCoordinates.first += movementSpeed * cos(ballAngle * PI / 180);
 	ballCoordinates.second += movementSpeed * sin(ballAngle * PI / 180);
