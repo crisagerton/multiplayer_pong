@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset='UTF-8' />
+	<style>
+		input, textarea {border:1px solid #CCC; margin:0px; padding:0px}
+		div {border: 1px solid black; padding:0px; margin:0px;}
+		td {width:80px;}
+
+        #ip {line-height:20px}
+        #port {line-height:20px}
+        #nickname {line-height:20px}
+
+        #playerScore {margin: auto;}
+
+		#gamebody {height: 400px; width:400px;}
+		#top-paddle {background-color: purple;}
+		#bottom-paddle {background-color: green; top: 567px;}
+		#left-paddle {background-color: blue;}
+		#right-paddle {background-color: yellow; left: 484px;}
+
+		.h-paddle {height:10px; width:100px; left: 245px; position: absolute;}
+		.v-paddle {height:100px; width:10px; top: 340px; position: absolute;}
+
+		.ball{background-color: red;width:20px; height:20px; border-radius: 10px;
+			  left: 285px; top: 360px; position: absolute;}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="fancywebsocket.js"></script>
+	<script>
+		//moved script
+	</script>
+</head>
+
+<body>
+        Server ip: <input type='text' id='ip' name='ip'><br>
+        Server port: <input type='text' id='port' name='port'><br>
+        Nickname: <input type='text' id='nickname' name='nickname'><br>
+        <button type="button" id='cntBtn' onclick="connect();">Connect</button>
+        <button type="button" id='dntBtn' onclick="disconnect();">Disconnect</button><br><br>
+
+    <table>
+    	<tr>
+    		<td></td>
+    		<td align='middle'><label id='username' name='username'>Username</label><br>Score:<br>
+    			<label id='playerScore' name='playerScore'>0</label></td>
+    		<td></td>
+    	</tr>
+    	<tr>
+    		<!-- <td align='middle'>Username<br>Score:<br>0</td> -->
+    		<td></td>
+    		<td>
+    			<div id='gamebody'>
+					<div class="h-paddle" id="top-paddle"></div>
+					<!-- <div class="h-paddle" id="bottom-paddle"></div>
+					<div class="v-paddle" id="left-paddle"></div>
+					<div class="v-paddle" id="right-paddle"></div> -->
+					<div class="ball" id="ball"></div>
+				</div>
+			</td>
+			<td></td>
+    		<!-- <td align='middle'>Username<br>Score:<br>0</td> -->
+    	</tr>
+    	<tr>
+    		<td></td>
+    		<!-- <td align='middle'>Username<br>Score:<br>0</td> -->
+    		<td></td>
+    	</tr>
+    </table>
+
+
+	<script>
+	/////////////SERVER WORK/////////////
+		var Server;
+
+		document.addEventListener('keydown', movePlayerPaddle);
+		document.addEventListener('keyup', stopPlayerPaddle);
+		document.addEventListener('keypress',movePlayerPaddle);
+
+		function log( text ) {
+			console.log(text);
+			if (text != ""){
+				console.log(text[0]);
+				if (text[0] == "s"){
+					document.getElementById('playerScore').textContent=text.slice(1);
+				}
+			}
+		}
+
+		function send( text ) {
+			Server.send( 'message', text );
+		}
+
+        function connect(){
+            log('Connecting...');
+			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
+
+			//Let the user know we're connected
+			Server.bind('open', function() {
+                document.getElementById("cntBtn").disabled = true;
+				log( "Connected." );
+			});
+
+			//OH NOES! Disconnection occurred.
+			Server.bind('close', function( data ) {
+                document.getElementById("cntBtn").disabled = false;
+				log( "Disconnected." );
+			});
+
+			//Log any messages sent from server
+			Server.bind('message', function( payload ) {
+				log( payload );
+			});
+
+			Server.connect();
+        }
+
+        function disconnect(){
+        	Server.disconnect();
+        }
+
+
+
+	//////////GAME STUFF/////////
+		var borderLeft = 0;
+		var borderRight = 600;
+		var borderTop = 0;
+		var borderBottom = 600;
+
+		var topPaddle = document.getElementById('top-paddle');
+		var topPaddleX = 245;
+		var topPaddleHeight = 200;
+		var topPaddleDirection = 0;
+		var topPaddleTimer;
+
+		topPaddle.style.left = 245 + 'px';
+
+		var ball = document.getElementById('ball');
+		var ballX = 285;
+		var ballY = 360;
+		var ballRadius = 20;
+
+		function updateScore(text){
+			document.getElementById('playerScore').textContent=text;
+		}
+
+		function moveBall(){
+			ball.style.left = ballX;
+			ball.style.top = ballY;
+		}
+
+		function moveBottomPaddle(){
+			bottomPaddleX += bottomPaddleDirection;
+			bottomPaddle.style.left = bottomPaddleX + 'px';
+		}
+
+		function moveTopPaddle(){
+			var newX = topPaddleX + topPaddleDirection;
+			if (newX >90 && newX < 400){
+				topPaddleX += topPaddleDirection;
+				topPaddle.style.left = topPaddleX + 'px';
+				send(topPaddleDirection);
+			}
+			console.log(topPaddle.style.left)
+		}
+
+		function movePlayerPaddle(e){
+			switch (e.code){
+				case 'ArrowRight':
+					if (!topPaddleTimer){
+						topPaddleDirection = 10;
+						topPaddleTimer = setInterval(moveTopPaddle, 50);
+					}
+					break;
+				case 'ArrowLeft':
+					if (!topPaddleTimer){
+						topPaddleDirection = -10;
+						topPaddleTimer = setInterval(moveTopPaddle, 50);
+					}
+					break;
+			}
+		}
+
+		function stopPlayerPaddle(e){
+			switch (e.code){
+				case 'ArrowRight':
+				case 'ArrowLeft':
+					clearInterval(topPaddleTimer);
+					topPaddleTimer = null;
+					send(""); //no input
+					break;
+			}
+		}
+
+	</script>
+</body>
+
+</html>
