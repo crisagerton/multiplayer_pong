@@ -77,12 +77,25 @@
 		document.addEventListener('keyup', stopPlayerPaddle);
 		document.addEventListener('keypress',movePlayerPaddle);
 
+		document.addEventListener('click', getLocationClick);
+		function getLocationClick(e){
+			console.log("clicked at: " + e.clientX + " " + e.clientY);
+		}
+
 		function log( text ) {
 			console.log(text);
 			if (text != ""){
-				console.log(text[0]);
-				if (text[0] == "s"){
-					document.getElementById('playerScore').textContent=text.slice(1);
+				if (text[0] == "s"){ //s for score
+					document.getElementById('playerScore').textContent=text.slice(2);
+				}
+				if (text[0] == "u"){ //u for username
+					document.getElementById('username').textContent=text.slice(2);
+				}
+				if (text[0] == "b"){//b for ball
+					var ball = document.getElementById('ball');
+					var splitCommand = text.split(" ");
+					ball.style.left = splitCommand[1] + 'px';
+					ball.style.top = splitCommand[2] + 'px';
 				}
 			}
 		}
@@ -136,17 +149,15 @@
 		topPaddle.style.left = 245 + 'px';
 
 		var ball = document.getElementById('ball');
-		var ballX = 285;
-		var ballY = 360;
 		var ballRadius = 20;
 
 		function updateScore(text){
 			document.getElementById('playerScore').textContent=text;
 		}
 
-		function moveBall(){
-			ball.style.left = ballX;
-			ball.style.top = ballY;
+		function moveBall(x, y){
+			ball.style.left += x;
+			ball.style.top += y;
 		}
 
 		function moveBottomPaddle(){

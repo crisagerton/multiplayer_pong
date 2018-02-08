@@ -9,7 +9,7 @@
 using namespace std;
 
 webSocket server;
-PongPhysicsEngine physics = PongPhysicsEngine(90, -750, -750, 750, 750);
+PongPhysicsEngine physics = PongPhysicsEngine(90, 94, 174, 495, 574);
 
 /* called when a client connects */
 void openHandler(int clientID) {
@@ -47,7 +47,7 @@ void messageHandler(int clientID, string message) {
 
 /* called once per select() loop */
 void periodicHandler() {
-	static time_t next = time(NULL) + 10;
+	static time_t next = time(NULL) + 1;
 	time_t current = time(NULL);
 	if (current >= next) {
 		ostringstream os;
@@ -55,23 +55,26 @@ void periodicHandler() {
 		timestring = timestring.substr(0, timestring.size() - 1);
 		os << timestring;*/
 		os << "periodicHandler...";
-
 		std::pair<double, double> paddleCoords = physics.getPaddleCoordinates();
 		os << paddleCoords.first << " " << paddleCoords.second;
-		os << " " << current << " " << next;
-
 		ostringstream score;
 		score << "s 100";
+		ostringstream username;
+		username << "u Test Name";
 
+		physics.moveBall(5);
+		ostringstream ballCoordinates;
+		std::pair<double, double> ballCoords = physics.getBallCoordinates();
+		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
 		
 		vector<int> clientIDs = server.getClientIDs();
 		for (int i = 0; i < clientIDs.size(); i++) {
 			server.wsSend(clientIDs[i], os.str());
 			server.wsSend(clientIDs[i], score.str());
+			server.wsSend(clientIDs[i], username.str());
+			server.wsSend(clientIDs[i], ballCoordinates.str());
 		}
-		next = time(NULL) + 10;
-
-
+		next = time(NULL) + 1;
 	}
 }
 

@@ -1,3 +1,3 @@
 ﻿  main.cpp
-c:\users\crystal\documents\ics 167\project 2\server83259933\pongphysicsengine.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  pong_server.vcxproj -> C:\Users\Crystal\Documents\ICS 167\Project 2\server83259933\x64\Debug\pong_server.exe
+c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  pong_server.vcxproj -> C:\Users\Crystal\Documents\ICS 167\multiplayer_pong\server83259933\x64\Debug\pong_server.exe

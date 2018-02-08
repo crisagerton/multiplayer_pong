@@ -2,11 +2,11 @@
 #include <cmath>
 
 PongPhysicsEngine::PongPhysicsEngine(double angle, double xMin, double yMin, double xMax, double yMax) {
-	ballCoordinates = std::make_pair(0, 0);
+	ballCoordinates = std::make_pair(285, 360);
 
 	ballAngle = angle;
 
-	paddleCoordinates = std::make_pair(0, 0);
+	paddleCoordinates = std::make_pair(245, yMin);
 
 	screenXMin = xMin;
 	screenYMin = yMin;
