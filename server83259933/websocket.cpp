@@ -654,6 +654,9 @@ void webSocket::wsAddClient(int socket, in_addr ip, int port) {
 	if (socket > fdmax)
 		fdmax = socket;
 
+	if (gameRoomMap.find(port) != gameRoomMap.end())
+		return;
+
 	int clientID = wsGetNextClientID();
 	wsClient *newClient = new wsClient(socket, ip);
 	if (clientID >= wsClients.size()) {
@@ -664,6 +667,7 @@ void webSocket::wsAddClient(int socket, in_addr ip, int port) {
 	}
 	socketIDmap[socket] = clientID;
 	portClientMap[clientID] = port;
+	gameRoomMap[port].push_back(clientID);
 }
 
 void webSocket::setOpenHandler(defaultCallback callback) {

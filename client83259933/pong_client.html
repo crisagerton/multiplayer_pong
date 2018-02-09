@@ -119,17 +119,20 @@
 
         function connect(){
             console.log('Connecting...');
+            document.getElementById("dntBtn").disabled = true;
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
 			//Let the user know we're connected
 			Server.bind('open', function() {
                 document.getElementById("cntBtn").disabled = true;
+                document.getElementById("dntBtn").disabled = false;
 				console.log( "Connected." );
 			});
 
 			//OH NOES! Disconnection occurred.
 			Server.bind('close', function( data ) {
                 document.getElementById("cntBtn").disabled = false;
+                document.getElementById("dntBtn").disabled = false;
 				console.log( "Disconnected." );
 			});
 

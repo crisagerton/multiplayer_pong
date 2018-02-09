@@ -105,6 +105,7 @@ private:
     vector<wsClient *> wsClients;
     map<int, int> socketIDmap;
 	map<int, int> portClientMap; //map of clients : ports
+	map<int, vector<int>> gameRoomMap; 
 	map<int, string> usernameClientMap; //map of clients : usernames
     fd_set fds;
     int fdmax;
