@@ -12,6 +12,8 @@ public:
 	std::pair<double, double> getPaddleCoordinates();
 	std::pair<double, double> getBallCoordinates();
 
+	int timer = 0;
+
 private:
 	std::pair<double, double> ballCoordinates;
 	std::pair<double, double> paddleCoordinates;

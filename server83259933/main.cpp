@@ -3,13 +3,17 @@
 #include <string>
 #include <sstream>
 #include <time.h>
+#include <random>
 #include "websocket.h"
 #include "PongPhysicsEngine.h"
 
 using namespace std;
 
 webSocket server;
-PongPhysicsEngine physics = PongPhysicsEngine(90, 94, 174, 495, 574);
+random_device device;
+default_random_engine engine{ device() };
+uniform_int_distribution<int> distribution{ 0, 360 };
+PongPhysicsEngine physics = PongPhysicsEngine(120, 94, 174, 495, 574);
 
 /* called when a client connects */
 void openHandler(int clientID) {
@@ -22,6 +26,10 @@ void openHandler(int clientID) {
 			server.wsSend(clientIDs[i], os.str());
 	}*/
 	server.wsSend(clientID, "Welcome!");
+	ostringstream ballCoordinates;
+	std::pair<double, double> ballCoords = physics.getBallCoordinates();
+	ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
+	server.wsSend(clientID, ballCoordinates.str());
 }
 
 /* called when a client disconnects */
@@ -49,11 +57,38 @@ void messageHandler(int clientID, string message) {
 void periodicHandler() {
 	static time_t next = time(NULL) + 1;
 	time_t current = time(NULL);
+
+	int currenttime = physics.timer;
+	physics.timer++;
+
 	if (current >= next) {
+		//ostringstream os;
+		//os << "periodicHandler...";
+		//std::pair<double, double> paddleCoords = physics.getPaddleCoordinates();
+		//os << paddleCoords.first << " " << paddleCoords.second;
+		//ostringstream score;
+		//score << "s 100";
+		//ostringstream username;
+		//username << "u Test Name";
+
+		//physics.moveBall(1);
+		//ostringstream ballCoordinates;
+		//std::pair<double, double> ballCoords = physics.getBallCoordinates();
+		//ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
+		//
+		//vector<int> clientIDs = server.getClientIDs();
+		//for (int i = 0; i < clientIDs.size(); i++) {
+		//	server.wsSend(clientIDs[i], os.str());
+		//	server.wsSend(clientIDs[i], score.str());
+		//	server.wsSend(clientIDs[i], username.str());
+		//	server.wsSend(clientIDs[i], ballCoordinates.str());
+		//}
+		next = time(NULL) + 1;
+	}
+
+	if (currenttime == 10) {
+		physics.timer = 0;
 		ostringstream os;
-		/*string timestring = ctime(&current);
-		timestring = timestring.substr(0, timestring.size() - 1);
-		os << timestring;*/
 		os << "periodicHandler...";
 		std::pair<double, double> paddleCoords = physics.getPaddleCoordinates();
 		os << paddleCoords.first << " " << paddleCoords.second;
@@ -66,7 +101,7 @@ void periodicHandler() {
 		ostringstream ballCoordinates;
 		std::pair<double, double> ballCoords = physics.getBallCoordinates();
 		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
-		
+
 		vector<int> clientIDs = server.getClientIDs();
 		for (int i = 0; i < clientIDs.size(); i++) {
 			server.wsSend(clientIDs[i], os.str());
@@ -74,13 +109,13 @@ void periodicHandler() {
 			server.wsSend(clientIDs[i], username.str());
 			server.wsSend(clientIDs[i], ballCoordinates.str());
 		}
-		next = time(NULL) + 1;
 	}
 }
 
 int main(int argc, char *argv[]) {
-	int ports[4] = { 8000,8001,8002,8003 };
 
+	int ports[4] = { 8000,8001,8002,8003 };
+	
 	/* set event handler */
 	server.setOpenHandler(openHandler);
 	server.setCloseHandler(closeHandler);

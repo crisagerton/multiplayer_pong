@@ -22,18 +22,20 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	double currentXMovement = movementSpeed * cos(ballAngle * PI / 180);
 	double currentYMovement = movementSpeed * sin(ballAngle * PI / 180);
 
+	double ballMaxCoordX = ballCoordinates.first + 20;
+	double ballMaxCoordY = ballCoordinates.second + 20;
 	// A Paddle
 	if (ballCoordinates.first == paddleCoordinates.first && ballCoordinates.second == paddleCoordinates.second) {
 		if (currentXMovement > 0) {
-			ballAngle += 90;
+			ballAngle -= 90;
 		}
 		else {
-			ballAngle -= 90;
+			ballAngle += 90;
 		}
 	}
 
 	// Top Wall
-	if ((ballCoordinates.first < screenXMin || ballCoordinates.first > screenXMax) && ballCoordinates.second == screenYMin) {
+	if (ballCoordinates.second <= screenYMin) {
 		if (currentXMovement > 0) {
 			ballAngle += 90;
 		}
@@ -42,8 +44,8 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 		}
 	}
 
-	// Bot Wall
-	if ((ballCoordinates.first < screenXMin || ballCoordinates.first > screenXMax) && ballCoordinates.second == screenYMax) {
+	// Bottom Wall
+	if (ballMaxCoordY >= screenYMax) {
 		if (currentXMovement > 0) {
 			ballAngle -= 90;
 		}
@@ -53,25 +55,30 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	}
 
 	// Left Wall
-	if (ballCoordinates.first == screenXMin && (ballCoordinates.second < screenYMin || ballCoordinates.second > screenYMax)) {
+	if (ballCoordinates.first <= screenXMin) {
 		if (currentYMovement > 0) {
-			ballAngle += 90;
+			ballAngle -= 90;
 		}
 		else {
-			ballAngle -= 90;
+			ballAngle += 90;
 		}
 	}
 
 	// Right Wall
-	if (ballCoordinates.first == screenXMax && (ballCoordinates.second < screenYMin || ballCoordinates.second > screenYMax)) {
+	if (ballMaxCoordX >= screenXMax) {
 		if (currentYMovement > 0) {
-			ballAngle -= 90;
-		}
-		else {
 			ballAngle += 90;
 		}
+		else {
+			ballAngle -= 90;
+		}
 	}
-
+	if (ballAngle > 360) {
+		ballAngle -= 360;
+	}
+	if (ballAngle < -360) {
+		ballAngle += 360;
+	}
 	ballCoordinates.first += movementSpeed * cos(ballAngle * PI / 180);
 	ballCoordinates.second += movementSpeed * sin(ballAngle * PI / 180);
 }
