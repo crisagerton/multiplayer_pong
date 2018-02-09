@@ -11,6 +11,7 @@ public:
 	void movePaddle(int dir, double movementSpeed);
 	std::pair<double, double> getPaddleCoordinates();
 	std::pair<double, double> getBallCoordinates();
+	int getPlayerScore(int playerNum);
 
 	int timer = 0;
 

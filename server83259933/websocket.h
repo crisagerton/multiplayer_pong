@@ -99,12 +99,13 @@ public:
     void wsClose(int clientID);
     vector<int> getClientIDs();
 	vector<int> getClientIDsWithSamePortAs(int clientID);
+	void setClientUsername(int clientID, string username);
     string getClientIP(int clientID);
 private:
     vector<wsClient *> wsClients;
     map<int, int> socketIDmap;
 	map<int, int> portClientMap; //map of clients : ports
-	map<int, vector<int>> gameRoomMap; //map of ports : vector of clients
+	map<int, string> usernameClientMap; //map of clients : usernames
     fd_set fds;
     int fdmax;
     int listenfd;

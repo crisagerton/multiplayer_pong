@@ -28,53 +28,70 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	double ballMaxCoordY = ballCoordinates.second + 20;
 
 	// A Paddle
-	if (ballCoordinates.second < paddleMaxCoordY && (ballCoordinates.first > paddleCoordinates.first || ballMaxCoordX > paddleMaxCoordX) && currentYMovement < 0) {
+	if ((ballCoordinates.second < paddleMaxCoordY) && 
+		(ballCoordinates.first > paddleCoordinates.first) && ballMaxCoordX <= paddleMaxCoordX){
+		/*
 		if (currentXMovement > 0) {
 			ballAngle += 90;
 		}
 		else {
 			ballAngle -= 90;
 		}
+		*/
+		playerScores[0] += 1;
+		ballAngle = 360 - ballAngle;
 	}
 
 	// Top Wall
-	if (ballCoordinates.second <= screenYMin && currentYMovement < 0) {
+	else if (ballCoordinates.second <= screenYMin && currentYMovement < 0) {
+		/*
 		if (currentXMovement > 0) {
 			ballAngle += 90;
 		}
 		else {
 			ballAngle -= 90;
 		}
+		*/
+		ballAngle = 360 - ballAngle;
 	}
 
 	// Bottom Wall
 	if (ballMaxCoordY >= screenYMax && currentYMovement > 0) {
+		/*
 		if (currentXMovement > 0) {
 			ballAngle -= 90;
 		}
 		else {
 			ballAngle += 90;
 		}
+		*/
+		ballAngle = 360 - ballAngle;
 	}
 
 	// Left Wall
 	if (ballCoordinates.first <= screenXMin && currentXMovement < 0) {
+		/*
 		if (currentYMovement > 0) {
 			ballAngle -= 90;
 		}
 		else {
 			ballAngle += 90;
 		}
+		*/
+		ballAngle = 180 - ballAngle;
 	}
 
 	// Right Wall
 	if (ballMaxCoordX >= screenXMax && currentXMovement > 0) {
+		/*
 		if (currentYMovement > 0) {
 			ballAngle += 90;
 		}
 		else {
 			ballAngle -= 90;
 		}
+		*/
+		ballAngle = 180 - ballAngle;
 	}
 
 	ballCoordinates.first += movementSpeed * cos(ballAngle * PI / 180);
@@ -84,9 +101,10 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 void PongPhysicsEngine::movePaddle(int dir, double movementSpeed) {
 	// Depends which paddle this is
 	int newX = paddleCoordinates.first + (dir * movementSpeed);
-	if (newX > screenXMin && newX < screenXMax) {
+	if (newX > screenXMin && newX < (screenXMax-90)) {
 		paddleCoordinates.first += dir * movementSpeed;
 	}
+	////try bouncing the ball thing only once
 }
 
 std::pair<double, double> PongPhysicsEngine::getPaddleCoordinates() {
@@ -95,4 +113,11 @@ std::pair<double, double> PongPhysicsEngine::getPaddleCoordinates() {
 
 std::pair<double, double> PongPhysicsEngine::getBallCoordinates() {
 	return ballCoordinates;
+}
+
+int PongPhysicsEngine::getPlayerScore(int playerNum) {
+	if (playerNum >= 0 && playerNum < 4) {
+		return playerScores[playerNum];
+	}
+	return 0;
 }

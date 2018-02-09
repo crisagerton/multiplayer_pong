@@ -77,25 +77,35 @@
 		document.addEventListener('keyup', stopPlayerPaddle);
 		document.addEventListener('keypress',movePlayerPaddle);
 
-		document.addEventListener('click', getLocationClick);
-		function getLocationClick(e){
-			console.log("clicked at: " + e.clientX + " " + e.clientY);
-		}
+		// document.addEventListener('click', getLocationClick);
+		// function getLocationClick(e){
+		// 	console.log("clicked at: " + e.clientX + " " + e.clientY);
+		// }
 
 		function log( text ) {
-			console.log(text);
+			//console.log(text);
 			if (text != ""){
 				if (text[0] == "s"){ //s for score
 					document.getElementById('playerScore').textContent=text.slice(2);
 				}
 				if (text[0] == "u"){ //u for username
-					document.getElementById('username').textContent=text.slice(2);
+					var clientname = document.getElementById('nickname').value;
+					send(clientname);
+					document.getElementById('username').textContent = clientname;
 				}
 				if (text[0] == "b"){//b for ball
 					var ball = document.getElementById('ball');
 					var splitCommand = text.split(" ");
 					ball.style.left = splitCommand[1] + 'px';
 					ball.style.top = splitCommand[2] + 'px';
+				}
+				if (text[0] == "p"){//p for player paddle
+					var paddle = document.getElementById('top-paddle');
+					var splitCommand = text.split(" ");
+					paddle.style.left = splitCommand[1] + 'px';
+				}
+				if (text[0] == "c"){//print to console (for testing purposes)
+					console.log(text);
 				}
 			}
 		}
@@ -168,11 +178,11 @@
 		function moveTopPaddle(){
 			var newX = topPaddleX + topPaddleDirection;
 			if (newX >90 && newX < 400){
-				topPaddleX += topPaddleDirection;
-				topPaddle.style.left = topPaddleX + 'px';
+				// topPaddleX += topPaddleDirection;
+				// topPaddle.style.left = topPaddleX + 'px';
 				send(topPaddleDirection);
 			}
-			console.log(topPaddle.style.left)
+			//console.log(topPaddle.style.left)
 		}
 
 		function movePlayerPaddle(e){

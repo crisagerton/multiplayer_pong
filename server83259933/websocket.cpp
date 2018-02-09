@@ -129,6 +129,11 @@ vector<int> webSocket::getClientIDsWithSamePortAs(int clientID) {
 	return clientIDS;
 }
 
+void webSocket::setClientUsername(int clientID, string username) {
+	usernameClientMap[clientID] = username;
+	wsSend(clientID, "c " + usernameClientMap[clientID]);
+}
+
 string webSocket::getClientIP(int clientID) {
 	return string(inet_ntoa(wsClients[clientID]->addr));
 }
