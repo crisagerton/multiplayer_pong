@@ -18,24 +18,27 @@ PongPhysicsEngine::PongPhysicsEngine(double angle, double xMin, double yMin, dou
 
 void PongPhysicsEngine::moveBall(double movementSpeed) {
 	// Account for offsets for paddle sizes and ball size
-
 	double currentXMovement = movementSpeed * cos(ballAngle * PI / 180);
 	double currentYMovement = movementSpeed * sin(ballAngle * PI / 180);
 
+	double paddleMaxCoordX = paddleCoordinates.first + 100;
+	double paddleMaxCoordY = paddleCoordinates.second + 10;
+
 	double ballMaxCoordX = ballCoordinates.first + 20;
 	double ballMaxCoordY = ballCoordinates.second + 20;
+
 	// A Paddle
-	if (ballCoordinates.first == paddleCoordinates.first && ballCoordinates.second == paddleCoordinates.second) {
+	if (ballCoordinates.second < paddleMaxCoordY && (ballCoordinates.first > paddleCoordinates.first || ballMaxCoordX > paddleMaxCoordX) && currentYMovement < 0) {
 		if (currentXMovement > 0) {
-			ballAngle -= 90;
+			ballAngle += 90;
 		}
 		else {
-			ballAngle += 90;
+			ballAngle -= 90;
 		}
 	}
 
 	// Top Wall
-	if (ballCoordinates.second <= screenYMin) {
+	if (ballCoordinates.second <= screenYMin && currentYMovement < 0) {
 		if (currentXMovement > 0) {
 			ballAngle += 90;
 		}
@@ -45,7 +48,7 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	}
 
 	// Bottom Wall
-	if (ballMaxCoordY >= screenYMax) {
+	if (ballMaxCoordY >= screenYMax && currentYMovement > 0) {
 		if (currentXMovement > 0) {
 			ballAngle -= 90;
 		}
@@ -55,7 +58,7 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	}
 
 	// Left Wall
-	if (ballCoordinates.first <= screenXMin) {
+	if (ballCoordinates.first <= screenXMin && currentXMovement < 0) {
 		if (currentYMovement > 0) {
 			ballAngle -= 90;
 		}
@@ -65,7 +68,7 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	}
 
 	// Right Wall
-	if (ballMaxCoordX >= screenXMax) {
+	if (ballMaxCoordX >= screenXMax && currentXMovement > 0) {
 		if (currentYMovement > 0) {
 			ballAngle += 90;
 		}
@@ -73,12 +76,7 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 			ballAngle -= 90;
 		}
 	}
-	if (ballAngle > 360) {
-		ballAngle -= 360;
-	}
-	if (ballAngle < -360) {
-		ballAngle += 360;
-	}
+
 	ballCoordinates.first += movementSpeed * cos(ballAngle * PI / 180);
 	ballCoordinates.second += movementSpeed * sin(ballAngle * PI / 180);
 }

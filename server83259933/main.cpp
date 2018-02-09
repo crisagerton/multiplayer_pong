@@ -13,7 +13,7 @@ webSocket server;
 random_device device;
 default_random_engine engine{ device() };
 uniform_int_distribution<int> distribution{ 0, 360 };
-PongPhysicsEngine physics = PongPhysicsEngine(120, 94, 174, 495, 574);
+PongPhysicsEngine physics = PongPhysicsEngine(distribution(engine)	, 94, 174, 494, 574);
 
 /* called when a client connects */
 void openHandler(int clientID) {
@@ -86,7 +86,7 @@ void periodicHandler() {
 		next = time(NULL) + 1;
 	}
 
-	if (currenttime == 10) {
+	if (currenttime == 2) {
 		physics.timer = 0;
 		ostringstream os;
 		os << "periodicHandler...";
@@ -97,7 +97,7 @@ void periodicHandler() {
 		ostringstream username;
 		username << "u Test Name";
 
-		physics.moveBall(5);
+		physics.moveBall(3);
 		ostringstream ballCoordinates;
 		std::pair<double, double> ballCoords = physics.getBallCoordinates();
 		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
