@@ -29,7 +29,7 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 
 	// A Paddle
 	if ((ballCoordinates.second < paddleMaxCoordY) && 
-		(ballCoordinates.first > paddleCoordinates.first) && ballMaxCoordX <= paddleMaxCoordX){
+		(ballMaxCoordX > paddleCoordinates.first) && ballCoordinates.first <= paddleMaxCoordX && currentYMovement < 0){
 		/*
 		if (currentXMovement > 0) {
 			ballAngle += 90;

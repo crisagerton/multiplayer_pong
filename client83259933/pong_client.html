@@ -90,6 +90,9 @@
 				}
 				if (text[0] == "u"){ //u for username
 					var clientname = document.getElementById('nickname').value;
+					if (clientname == ""){
+						clientname = "Player --";
+					}
 					send(clientname);
 					document.getElementById('username').textContent = clientname;
 				}
@@ -115,19 +118,19 @@
 		}
 
         function connect(){
-            log('Connecting...');
+            console.log('Connecting...');
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
 			//Let the user know we're connected
 			Server.bind('open', function() {
                 document.getElementById("cntBtn").disabled = true;
-				log( "Connected." );
+				console.log( "Connected." );
 			});
 
 			//OH NOES! Disconnection occurred.
 			Server.bind('close', function( data ) {
                 document.getElementById("cntBtn").disabled = false;
-				log( "Disconnected." );
+				console.log( "Disconnected." );
 			});
 
 			//Log any messages sent from server
