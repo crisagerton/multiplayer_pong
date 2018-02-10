@@ -67,7 +67,7 @@ void periodicHandler() {
 		next = time(NULL) + 1;
 	}
 
-	if (currenttime == 2) {
+	if (currenttime == 5) {
 		physics.timer = 0;
 		ostringstream os;
 		os << "periodicHandler...";
@@ -75,10 +75,10 @@ void periodicHandler() {
 		os << paddleCoords.first << " " << paddleCoords.second;
 		ostringstream score;
 		score << "s " << physics.getPlayerScore(0);
-		/*ostringstream username;
-		username << "u Test Name";*/
 
-		physics.moveBall(5);
+		if (server.getGameRoomMap().size() >= 1) {
+			physics.moveBall(8);
+		}
 		ostringstream ballCoordinates;
 		std::pair<double, double> ballCoords = physics.getBallCoordinates();
 		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
@@ -88,19 +88,19 @@ void periodicHandler() {
 		pc << "p " << padCoords.first << " " << padCoords.second;
 
 		vector<int> clientIDs = server.getClientIDs();
-		for (int i = 0; i < clientIDs.size(); i++) {
+		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
 			server.wsSend(clientIDs[i], os.str());
 			server.wsSend(clientIDs[i], score.str());
-			//server.wsSend(clientIDs[i], username.str());
 			server.wsSend(clientIDs[i], ballCoordinates.str());
-			server.wsSend(clientIDs[i], pc.str());
+			server.wsSend(clientIDs[i], pc.str()); //paddle coordinates
 		}
 	}
 }
 
 int main(int argc, char *argv[]) {
 
-	int ports[4] = { 8000,8001,8002,8003 };
+	//int ports[4] = { 8000,8001,8002,8003 };
+	int ports[1] = { 8000 };
 	
 	/* set event handler */
 	server.setOpenHandler(openHandler);

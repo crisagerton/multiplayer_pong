@@ -101,11 +101,12 @@ public:
 	vector<int> getClientIDsWithSamePortAs(int clientID);
 	void setClientUsername(int clientID, string username);
     string getClientIP(int clientID);
+	map<int, vector<int>> getGameRoomMap();
 private:
     vector<wsClient *> wsClients;
     map<int, int> socketIDmap;
 	map<int, int> portClientMap; //map of clients : ports
-	map<int, vector<int>> gameRoomMap; 
+	map<int, vector<int>> gameRoomMap; //map of ports (game rooms) to users in that game room (based on clientIDs)
 	map<int, string> usernameClientMap; //map of clients : usernames
     fd_set fds;
     int fdmax;

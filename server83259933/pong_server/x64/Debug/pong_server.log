@@ -1,30 +1,3 @@
-﻿  websocket.cpp
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(90): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'LPVOID'
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(172): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(178): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(202): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(211): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(212): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(225): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(226): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(227): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(228): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(233): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(283): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(296): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(309): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(449): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(602): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(604): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(734): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(749): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(764): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(779): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(815): warning C4244: 'initializing': conversion from 'SOCKET' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(824): warning C4244: 'initializing': conversion from 'SOCKET' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(833): warning C4244: 'initializing': conversion from 'SOCKET' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(842): warning C4244: 'initializing': conversion from 'SOCKET' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(719): warning C4101: 'serv_addr2': unreferenced local variable
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(719): warning C4101: 'serv_addr4': unreferenced local variable
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\websocket.cpp(719): warning C4101: 'serv_addr3': unreferenced local variable
+﻿  main.cpp
+c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   pong_server.vcxproj -> C:\Users\Crystal\Documents\ICS 167\multiplayer_pong\server83259933\x64\Debug\pong_server.exe
