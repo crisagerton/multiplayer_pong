@@ -1,3 +1,7 @@
 ﻿  main.cpp
 c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  PongPhysicsEngine.cpp
+c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.cpp(63): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  Generating Code...
   pong_server.vcxproj -> C:\Users\Crystal\Documents\ICS 167\multiplayer_pong\server83259933\x64\Debug\pong_server.exe

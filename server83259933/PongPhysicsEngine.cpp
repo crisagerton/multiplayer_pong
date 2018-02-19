@@ -30,67 +30,27 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	// A Paddle
 	if ((ballCoordinates.second < paddleMaxCoordY) && 
 		(ballMaxCoordX > paddleCoordinates.first) && ballCoordinates.first <= paddleMaxCoordX && currentYMovement < 0){
-		/*
-		if (currentXMovement > 0) {
-			ballAngle += 90;
-		}
-		else {
-			ballAngle -= 90;
-		}
-		*/
 		playerScores[0] += 1;
 		ballAngle = 360 - ballAngle;
 	}
 
 	// Top Wall
 	else if (ballCoordinates.second <= screenYMin && currentYMovement < 0) {
-		/*
-		if (currentXMovement > 0) {
-			ballAngle += 90;
-		}
-		else {
-			ballAngle -= 90;
-		}
-		*/
 		ballAngle = 360 - ballAngle;
 	}
 
 	// Bottom Wall
 	if (ballMaxCoordY >= screenYMax && currentYMovement > 0) {
-		/*
-		if (currentXMovement > 0) {
-			ballAngle -= 90;
-		}
-		else {
-			ballAngle += 90;
-		}
-		*/
 		ballAngle = 360 - ballAngle;
 	}
 
 	// Left Wall
 	if (ballCoordinates.first <= screenXMin && currentXMovement < 0) {
-		/*
-		if (currentYMovement > 0) {
-			ballAngle -= 90;
-		}
-		else {
-			ballAngle += 90;
-		}
-		*/
 		ballAngle = 180 - ballAngle;
 	}
 
 	// Right Wall
 	if (ballMaxCoordX >= screenXMax && currentXMovement > 0) {
-		/*
-		if (currentYMovement > 0) {
-			ballAngle += 90;
-		}
-		else {
-			ballAngle -= 90;
-		}
-		*/
 		ballAngle = 180 - ballAngle;
 	}
 
@@ -104,7 +64,6 @@ void PongPhysicsEngine::movePaddle(int dir, double movementSpeed) {
 	if (newX > screenXMin && newX < (screenXMax-90)) {
 		paddleCoordinates.first += dir * movementSpeed;
 	}
-	////try bouncing the ball thing only once
 }
 
 std::pair<double, double> PongPhysicsEngine::getPaddleCoordinates() {
@@ -120,4 +79,19 @@ int PongPhysicsEngine::getPlayerScore(int playerNum) {
 		return playerScores[playerNum];
 	}
 	return 0;
+}
+
+void PongPhysicsEngine::resetTo(double angle, double xMin, double yMin, double xMax, double yMax) {
+	ballCoordinates = std::make_pair(285, 360);
+
+	ballAngle = angle;
+
+	paddleCoordinates = std::make_pair(245, yMin);
+
+	screenXMin = xMin;
+	screenYMin = yMin;
+	screenXMax = xMax;
+	screenYMax = yMax;
+
+	paddleLastTouched = NULL;
 }

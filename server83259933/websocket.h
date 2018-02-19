@@ -100,6 +100,7 @@ public:
     vector<int> getClientIDs();
 	vector<int> getClientIDsWithSamePortAs(int clientID);
 	void setClientUsername(int clientID, string username);
+	string getClientUsername(int clientID);
     string getClientIP(int clientID);
 	map<int, vector<int>> getGameRoomMap();
 private:

@@ -131,7 +131,16 @@ vector<int> webSocket::getClientIDsWithSamePortAs(int clientID) {
 
 void webSocket::setClientUsername(int clientID, string username) {
 	usernameClientMap[clientID] = username;
-	wsSend(clientID, "c " + usernameClientMap[clientID]);
+	string message;
+	message.append("u");
+	message.append(to_string(clientID));
+	message.append(" ");
+	message.append(username);
+	wsSend(clientID, message);
+}
+
+string webSocket::getClientUsername(int clientID) {
+	return usernameClientMap[clientID];
 }
 
 map<int, vector<int>> webSocket::getGameRoomMap() {
@@ -346,8 +355,14 @@ void webSocket::wsRemoveClient(int clientID) {
 	FD_CLR(client->socket, &fds);
 
 	socketIDmap.erase(wsClients[clientID]->socket);
+	int clientPort = portClientMap[clientID];
 	portClientMap.erase(clientID);
-	//gameRoomMap[1].pop_back();
+	vector<int> gameRoom;
+	for (int i = 0; i < gameRoom.size(); i++) {
+		if (gameRoomMap[clientPort][i] != clientID)
+			gameRoom[i] = gameRoomMap[clientPort][i];
+	}
+	gameRoomMap[clientPort] = gameRoom;
 	
 	wsClients[clientID] = NULL;
 	delete client;
@@ -660,11 +675,6 @@ void webSocket::wsAddClient(int socket, in_addr ip, int port) {
 	if (socket > fdmax)
 		fdmax = socket;
 
-	/*if (gameRoomMap.find(port) != gameRoomMap.end()) {
-		printf("No ");
-		return;
-	}*/
-
 	int clientID = wsGetNextClientID();
 	wsClient *newClient = new wsClient(socket, ip);
 	if (clientID >= wsClients.size()) {
@@ -676,6 +686,7 @@ void webSocket::wsAddClient(int socket, in_addr ip, int port) {
 	socketIDmap[socket] = clientID;
 	portClientMap[clientID] = port;
 	gameRoomMap[port].push_back(clientID);
+	cout << gameRoomMap[port].size() << endl;
 }
 
 void webSocket::setOpenHandler(defaultCallback callback) {
@@ -801,7 +812,7 @@ void webSocket::startServers(int ports[]) {
 
 
 
-	fdmax = listenfd;
+	fdmax = listenfd4;
 	fd_set read_fds;
 	FD_ZERO(&fds);
 	FD_SET(listenfd, &fds);
@@ -822,7 +833,7 @@ void webSocket::startServers(int ports[]) {
 					if (i == listenfd) {
 						socklen_t addrlen = sizeof(cli_addr);
 						int newfd = accept(listenfd, (struct sockaddr*)&cli_addr, &addrlen);
-						if (newfd != -1 && gameRoomMap.size() < 1) {
+						if (newfd != -1 && gameRoomMap[1].size() < 4) {
 							/* add new client */
 							wsAddClient(newfd, cli_addr.sin_addr, 1);
 							printf("New connection from %s on socket %d\n", inet_ntoa(cli_addr.sin_addr), newfd);
@@ -834,28 +845,37 @@ void webSocket::startServers(int ports[]) {
 					else if (i == listenfd2) {
 						socklen_t addrlen = sizeof(cli_addr);
 						int newfd = accept(listenfd2, (struct sockaddr*)&cli_addr, &addrlen);
-						if (newfd != -1) {
+						if (newfd != -1 && gameRoomMap[2].size() < 4) {
 							/* add new client */
 							wsAddClient(newfd, cli_addr.sin_addr, 2);
 							printf("New connection from %s on socket %d\n", inet_ntoa(cli_addr.sin_addr), newfd);
+						}
+						else {
+							printf("Server occupied");
 						}
 					}
 					else if (i == listenfd3) {
 						socklen_t addrlen = sizeof(cli_addr);
 						int newfd = accept(listenfd3, (struct sockaddr*)&cli_addr, &addrlen);
-						if (newfd != -1) {
+						if (newfd != -1 && gameRoomMap[3].size() < 4) {
 							/* add new client */
 							wsAddClient(newfd, cli_addr.sin_addr, 3);
 							printf("New connection from %s on socket %d\n", inet_ntoa(cli_addr.sin_addr), newfd);
+						}
+						else {
+							printf("Server occupied");
 						}
 					}
 					else if (i == listenfd4) {
 						socklen_t addrlen = sizeof(cli_addr);
 						int newfd = accept(listenfd4, (struct sockaddr*)&cli_addr, &addrlen);
-						if (newfd != -1) {
+						if (newfd != -1 && gameRoomMap[4].size() < 4) {
 							/* add new client */
 							wsAddClient(newfd, cli_addr.sin_addr, 4);
 							printf("New connection from %s on socket %d\n", inet_ntoa(cli_addr.sin_addr), newfd);
+						}
+						else {
+							printf("Server occupied");
 						}
 					}
 					else {

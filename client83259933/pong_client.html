@@ -42,28 +42,31 @@
     <table>
     	<tr>
     		<td></td>
-    		<td align='middle'><label id='username' name='username'>Username</label><br>Score:<br>
+    		<td align='middle'><label id='username1' name='username'>No Player</label><br>Score:<br>
     			<label id='playerScore' name='playerScore'>0</label></td>
     		<td></td>
     	</tr>
     	<tr>
-    		<!-- <td align='middle'>Username<br>Score:<br>0</td> -->
-    		<td></td>
+    		<td align='middle'><label id='username2' name='username'>No Player</label><br>Score:<br>
+    			<label id='playerScore' name='playerScore'>0</label></td>
+
     		<td>
     			<div id='gamebody'>
 					<div class="h-paddle" id="top-paddle"></div>
-					<!-- <div class="h-paddle" id="bottom-paddle"></div>
+					<div class="h-paddle" id="bottom-paddle"></div>
 					<div class="v-paddle" id="left-paddle"></div>
-					<div class="v-paddle" id="right-paddle"></div> -->
+					<div class="v-paddle" id="right-paddle"></div>
 					<div class="ball" id="ball"></div>
 				</div>
 			</td>
-			<td></td>
-    		<!-- <td align='middle'>Username<br>Score:<br>0</td> -->
+
+    		<td align='middle'><label id='username3' name='username'>No Player</label><br>Score:<br>
+    			<label id='playerScore' name='playerScore'>0</label></td>
     	</tr>
     	<tr>
     		<td></td>
-    		<!-- <td align='middle'>Username<br>Score:<br>0</td> -->
+    		<td align='middle'><label id='username4' name='username'>No Player</label><br>Score:<br>
+    			<label id='playerScore' name='playerScore'>0</label></td>
     		<td></td>
     	</tr>
     </table>
@@ -89,12 +92,12 @@
 					document.getElementById('playerScore').textContent=text.slice(2);
 				}
 				if (text[0] == "u"){ //u for username
-					var clientname = document.getElementById('nickname').value;
-					if (clientname == ""){
-						clientname = "Player --";
+					if (text == "u get"){
+						setUsername(text);
 					}
-					send(clientname);
-					document.getElementById('username').textContent = clientname;
+					else{
+						displayUsernames(text);
+					}
 				}
 				if (text[0] == "b"){//b for ball
 					var ball = document.getElementById('ball');
@@ -146,7 +149,36 @@
 
         function disconnect(){
         	Server.disconnect();
+        	console.log("Manual Disconnection");
         }
+
+
+    //////////Helper Functions for Server Stuff////////
+    	function setUsername(text){
+			var clientname = document.getElementById('nickname').value;
+			if (clientname == ""){
+				clientname = "Player --";
+			}
+			send("u " + clientname);
+    	}
+
+    	function displayUsernames(text){
+			var user = text.slice(3);//splitCommand[1];
+
+			if (text[1] == "0"){
+				document.getElementById('username1').textContent = user;
+			}
+			if (text[1] == "1"){
+				document.getElementById('username2').textContent = user;
+			}
+			if (text[1] == "2"){
+				document.getElementById('username3').textContent = user;
+			}
+			if (text[1] == "3"){
+				document.getElementById('username4').textContent = user;
+			}
+			console.log(text);
+    	}
 
 
 
@@ -162,7 +194,7 @@
 		var topPaddleDirection = 0;
 		var topPaddleTimer;
 
-		topPaddle.style.left = 245 + 'px';
+		// topPaddle.style.left = 245 + 'px';
 
 		var ball = document.getElementById('ball');
 		var ballRadius = 20;
@@ -177,13 +209,17 @@
 		}
 
 		function moveBottomPaddle(){
-			bottomPaddleX += bottomPaddleDirection;
-			bottomPaddle.style.left = bottomPaddleX + 'px';
+			var newX = bottomPaddleX + bottomPaddleDirection;
+			if (newX > 90 && newX < 400){
+				// topPaddleX += topPaddleDirection;
+				// topPaddle.style.left = topPaddleX + 'px';
+				send(bottomPaddleDirection);
+			}
 		}
 
 		function moveTopPaddle(){
 			var newX = topPaddleX + topPaddleDirection;
-			if (newX >90 && newX < 400){
+			if (newX > 90 && newX < 400){
 				// topPaddleX += topPaddleDirection;
 				// topPaddle.style.left = topPaddleX + 'px';
 				send(topPaddleDirection);

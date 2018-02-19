@@ -27,18 +27,33 @@ void openHandler(int clientID) {
 	}*/
 	server.wsSend(clientID, "Welcome!");
 	server.wsSend(clientID, "u get"); ///get username from client
+
+	vector<int> clientIDs = server.getClientIDsWithSamePortAs(clientID);
+	for (int i = 0; i < clientIDs.size(); i++) {
+		if (clientIDs[i] != clientID) {
+			ostringstream os;
+			os << "u";
+			os << clientIDs[i] << " " << server.getClientUsername(clientIDs[i]);
+			server.wsSend(clientID, os.str());
+		}
+	}
 }
 
 /* called when a client disconnects */
 void closeHandler(int clientID) {
 	ostringstream os;
-	os << "Stranger " << clientID << " has left.";
+	os << "c Stranger " << clientID << " has left.";
+	ostringstream resetUsername;
+	resetUsername << "u" << clientID << " No Player";
 
 	vector<int> clientIDs = server.getClientIDsWithSamePortAs(clientID);
 	for (int i = 0; i < clientIDs.size(); i++) {
-		if (clientIDs[i] != clientID)
+		if (clientIDs[i] != clientID) {
 			server.wsSend(clientIDs[i], os.str());
+			server.wsSend(clientIDs[i], resetUsername.str());
+		}
 	}
+	physics.resetTo(70, 94, 174, 494, 574);
 }
 
 /* called when a client sends a message to the server */
@@ -52,6 +67,13 @@ void messageHandler(int clientID, string message) {
 	//add usernames to storage
 	if (message.substr(0,1) == "u") {
 		server.setClientUsername(clientID, message.substr(2));
+		vector<int> clientIDs = server.getClientIDs();
+		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
+			ostringstream os;
+			os << "u" << clientID << " " << message.substr(2);
+			cout << os.str() << endl;
+			server.wsSend(clientIDs[i], os.str());
+		}
 	}
 }
 
@@ -70,13 +92,11 @@ void periodicHandler() {
 	if (currenttime == 5) {
 		physics.timer = 0;
 		ostringstream os;
-		os << "periodicHandler...";
 		std::pair<double, double> paddleCoords = physics.getPaddleCoordinates();
-		os << paddleCoords.first << " " << paddleCoords.second;
 		ostringstream score;
 		score << "s " << physics.getPlayerScore(0);
 
-		if (server.getGameRoomMap().size() >= 1) {
+		if (server.getGameRoomMap()[1].size() >= 4) {
 			physics.moveBall(8);
 		}
 		ostringstream ballCoordinates;
@@ -89,7 +109,6 @@ void periodicHandler() {
 
 		vector<int> clientIDs = server.getClientIDs();
 		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
-			server.wsSend(clientIDs[i], os.str());
 			server.wsSend(clientIDs[i], score.str());
 			server.wsSend(clientIDs[i], ballCoordinates.str());
 			server.wsSend(clientIDs[i], pc.str()); //paddle coordinates
