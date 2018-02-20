@@ -8,8 +8,8 @@ PongPhysicsEngine::PongPhysicsEngine(double angle, double xMin, double yMin, dou
 
 	topPaddleCoordinates = std::make_pair(245, yMin);
 	botPaddleCoordinates = std::make_pair(245, yMax);
-	leftPaddleCoordinates = std::make_pair(xMin, 245);
-	rightPaddleCoordinates = std::make_pair(xMax, 245);
+	leftPaddleCoordinates = std::make_pair(xMin, 340);
+	rightPaddleCoordinates = std::make_pair(xMax, 340);
 
 	screenXMin = xMin;
 	screenYMin = yMin;
@@ -34,7 +34,7 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 		ballAngle = 360 - ballAngle;
 	}
 
-	// Bot Paddle
+	// Bottom Paddle
 	if ((ballCoordinates.second >= botPaddleCoordinates.second) &&
 		(ballMaxCoordX >= botPaddleCoordinates.first) && ballCoordinates.first <= botPaddleCoordinates.first + 100 && currentYMovement > 0) {
 		playerScores[1] += 1;
@@ -79,15 +79,43 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	ballCoordinates.second += movementSpeed * sin(ballAngle * PI / 180);
 }
 
-void PongPhysicsEngine::movePaddle(int dir, double movementSpeed) {
+void PongPhysicsEngine::movePaddle(int clientID, int dir, double movementSpeed) {
 	// Depends which paddle this is
-	int newX = topPaddleCoordinates.first + (dir * movementSpeed);
-	if (newX > screenXMin && newX < (screenXMax-90)) {
-		topPaddleCoordinates.first += dir * movementSpeed;
+	if (clientID == 0) { //top player
+		int newX = topPaddleCoordinates.first + (dir * movementSpeed);
+		if (newX > screenXMin && newX < (screenXMax - 90)) {
+			topPaddleCoordinates.first += dir * movementSpeed;
+		}
+	}
+	if (clientID == 1) { //left player
+		int newY = leftPaddleCoordinates.second + (dir * movementSpeed);
+		if (newY > screenYMin && newY < (screenYMax - 90)) {
+			leftPaddleCoordinates.second += dir * movementSpeed;
+		}
+	}
+	if (clientID == 2) { //right player
+		int newY = rightPaddleCoordinates.second + (dir * movementSpeed);
+		if (newY > screenYMin && newY < (screenYMax - 90)) {
+			rightPaddleCoordinates.second += dir * movementSpeed;
+		}
+	}
+	if (clientID == 3) { //bottom player
+		int newX = botPaddleCoordinates.first + (dir * movementSpeed);
+		if (newX > screenXMin && newX < (screenXMax - 90)) {
+			botPaddleCoordinates.first += dir * movementSpeed;
+		}
 	}
 }
 
-std::pair<double, double> PongPhysicsEngine::getPaddleCoordinates() {
+std::pair<double, double> PongPhysicsEngine::getPaddleCoordinates(int paddle) {
+	if (paddle == 0) //top paddle
+		return topPaddleCoordinates;
+	if (paddle == 1) //left paddle
+		return leftPaddleCoordinates;
+	if (paddle == 2) //right paddle
+		return rightPaddleCoordinates;
+	if (paddle == 3) //bottom paddle
+		return botPaddleCoordinates;
 	return topPaddleCoordinates;
 }
 

@@ -8,8 +8,8 @@ public:
 
 	void moveBall(double movementSpeed);
 
-	void movePaddle(int dir, double movementSpeed);
-	std::pair<double, double> getPaddleCoordinates();
+	void movePaddle(int clientID, int dir, double movementSpeed);
+	std::pair<double, double> getPaddleCoordinates(int paddle);
 	std::pair<double, double> getBallCoordinates();
 	int getPlayerScore(int playerNum);
 	void resetTo(double angle, double xMin, double yMin, double xMax, double yMax);
