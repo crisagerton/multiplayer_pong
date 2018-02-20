@@ -18,7 +18,10 @@ public:
 
 private:
 	std::pair<double, double> ballCoordinates;
-	std::pair<double, double> paddleCoordinates;
+	std::pair<double, double> topPaddleCoordinates;
+	std::pair<double, double> botPaddleCoordinates;
+	std::pair<double, double> leftPaddleCoordinates;
+	std::pair<double, double> rightPaddleCoordinates;
 
 	double ballAngle;
 

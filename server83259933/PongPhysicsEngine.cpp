@@ -6,7 +6,10 @@ PongPhysicsEngine::PongPhysicsEngine(double angle, double xMin, double yMin, dou
 
 	ballAngle = angle;
 
-	paddleCoordinates = std::make_pair(245, yMin);
+	topPaddleCoordinates = std::make_pair(245, yMin);
+	botPaddleCoordinates = std::make_pair(245, yMax);
+	leftPaddleCoordinates = std::make_pair(xMin, 245);
+	rightPaddleCoordinates = std::make_pair(xMax, 245);
 
 	screenXMin = xMin;
 	screenYMin = yMin;
@@ -21,16 +24,34 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	double currentXMovement = movementSpeed * cos(ballAngle * PI / 180);
 	double currentYMovement = movementSpeed * sin(ballAngle * PI / 180);
 
-	double paddleMaxCoordX = paddleCoordinates.first + 100;
-	double paddleMaxCoordY = paddleCoordinates.second + 10;
-
 	double ballMaxCoordX = ballCoordinates.first + 20;
 	double ballMaxCoordY = ballCoordinates.second + 20;
 
-	// A Paddle
-	if ((ballCoordinates.second < paddleMaxCoordY) && 
-		(ballMaxCoordX > paddleCoordinates.first) && ballCoordinates.first <= paddleMaxCoordX && currentYMovement < 0){
+	// Top Paddle
+	if ((ballCoordinates.second <= topPaddleCoordinates.second + 10) &&
+		(ballMaxCoordX >= topPaddleCoordinates.first) && ballCoordinates.first <= topPaddleCoordinates.first + 100 && currentYMovement < 0){
 		playerScores[0] += 1;
+		ballAngle = 360 - ballAngle;
+	}
+
+	// Bot Paddle
+	if ((ballCoordinates.second >= botPaddleCoordinates.second) &&
+		(ballMaxCoordX >= botPaddleCoordinates.first) && ballCoordinates.first <= botPaddleCoordinates.first + 100 && currentYMovement > 0) {
+		playerScores[1] += 1;
+		ballAngle = 360 - ballAngle;
+	}
+
+	// Left Paddle
+	if ((ballCoordinates.second <= leftPaddleCoordinates.second + 100) &&
+		(ballCoordinates.second >= leftPaddleCoordinates.second) && (ballCoordinates.first >= leftPaddleCoordinates.first + 10) && currentXMovement > 0) {
+		playerScores[2] += 1;
+		ballAngle = 360 - ballAngle;
+	}
+
+	// Right Paddle
+	if ((ballCoordinates.second <= rightPaddleCoordinates.second + 100) &&
+		(ballCoordinates.second >= rightPaddleCoordinates.second) && (ballCoordinates.first <= rightPaddleCoordinates.first) && currentXMovement < 0) {
+		playerScores[3] += 1;
 		ballAngle = 360 - ballAngle;
 	}
 
@@ -60,14 +81,14 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 
 void PongPhysicsEngine::movePaddle(int dir, double movementSpeed) {
 	// Depends which paddle this is
-	int newX = paddleCoordinates.first + (dir * movementSpeed);
+	int newX = topPaddleCoordinates.first + (dir * movementSpeed);
 	if (newX > screenXMin && newX < (screenXMax-90)) {
-		paddleCoordinates.first += dir * movementSpeed;
+		topPaddleCoordinates.first += dir * movementSpeed;
 	}
 }
 
 std::pair<double, double> PongPhysicsEngine::getPaddleCoordinates() {
-	return paddleCoordinates;
+	return topPaddleCoordinates;
 }
 
 std::pair<double, double> PongPhysicsEngine::getBallCoordinates() {
@@ -86,7 +107,7 @@ void PongPhysicsEngine::resetTo(double angle, double xMin, double yMin, double x
 
 	ballAngle = angle;
 
-	paddleCoordinates = std::make_pair(245, yMin);
+	topPaddleCoordinates = std::make_pair(245, yMin);
 
 	screenXMin = xMin;
 	screenYMin = yMin;
