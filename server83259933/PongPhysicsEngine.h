@@ -1,6 +1,7 @@
 #ifndef PONGPHYSICSENGINE_H
 #define PONGPHYSICSENGINE_H
 #include <utility>;
+#include <vector>;
 
 class PongPhysicsEngine {
 public:
@@ -8,8 +9,8 @@ public:
 
 	void moveBall(double movementSpeed);
 
-	void movePaddle(int dir, double movementSpeed);
-	std::pair<double, double> getPaddleCoordinates();
+	void movePaddle(int i, int dir, double movementSpeed);
+	std::pair<double, double> getPaddleCoordinates(int i);
 	std::pair<double, double> getBallCoordinates();
 	int getPlayerScore(int playerNum);
 	void resetTo(double angle, double xMin, double yMin, double xMax, double yMax);
@@ -18,10 +19,8 @@ public:
 
 private:
 	std::pair<double, double> ballCoordinates;
-	std::pair<double, double> topPaddleCoordinates;
-	std::pair<double, double> botPaddleCoordinates;
-	std::pair<double, double> leftPaddleCoordinates;
-	std::pair<double, double> rightPaddleCoordinates;
+
+	std::vector<std::pair<double, double>> paddleCoordinates;
 
 	double ballAngle;
 

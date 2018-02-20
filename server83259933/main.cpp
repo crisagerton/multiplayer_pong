@@ -62,7 +62,7 @@ void messageHandler(int clientID, string message) {
 	int y = 0;
 	if (message == "10") { y = 2; }
 	if (message == "-10") { y = -2; }
-	physics.movePaddle(y, 5);
+	physics.movePaddle(0, y, 5);
 
 	//add usernames to storage
 	if (message.substr(0,1) == "u") {
@@ -92,7 +92,7 @@ void periodicHandler() {
 	if (currenttime == 5) {
 		physics.timer = 0;
 		ostringstream os;
-		std::pair<double, double> paddleCoords = physics.getPaddleCoordinates();
+		std::pair<double, double> paddleCoords = physics.getPaddleCoordinates(0);
 		ostringstream score;
 		score << "s " << physics.getPlayerScore(0);
 
@@ -104,7 +104,7 @@ void periodicHandler() {
 		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
 
 		ostringstream pc;
-		std::pair<double, double> padCoords = physics.getPaddleCoordinates();
+		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
 		pc << "p " << padCoords.first << " " << padCoords.second;
 
 		vector<int> clientIDs = server.getClientIDs();
