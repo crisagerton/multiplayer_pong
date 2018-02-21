@@ -13,7 +13,7 @@ webSocket server;
 //random_device device;
 //default_random_engine engine{ device() };
 //uniform_int_distribution<int> distribution{ 0, 360 };
-PongPhysicsEngine physics = PongPhysicsEngine(70, 94, 174, 494, 574);
+PongPhysicsEngine physics = PongPhysicsEngine(70, 94, 177, 494, 577);
 
 /* called when a client connects */
 void openHandler(int clientID) {
@@ -53,16 +53,11 @@ void closeHandler(int clientID) {
 			server.wsSend(clientIDs[i], resetUsername.str());
 		}
 	}
-	physics.resetTo(70, 94, 174, 494, 574);
+	physics.resetTo(70, 94, 177, 494, 577);
 }
 
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message) {
-
-	server.wsSend(clientID, message);
-	int y = 0;
-	if (message == "10") { y = 2; }
-	if (message == "-10") { y = -2; }
 
 	//server.wsSend(clientID, message);
 	int changeXorYby = 0;
@@ -100,9 +95,10 @@ void periodicHandler() {
 		physics.timer = 0;
 		ostringstream os;
 		ostringstream score;
-		score << "s " << physics.getPlayerScore(0);
+		score << "s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " << 
+			physics.getPlayerScore(2) << " "<< physics.getPlayerScore(3);
 
-		if (server.getGameRoomMap()[1].size() >= 4) {
+		if (server.getGameRoomMap()[1].size() >= 1) {
 			physics.moveBall(8);
 		}
 		ostringstream ballCoordinates;
@@ -113,20 +109,26 @@ void periodicHandler() {
 		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
 		pc1 << "p t " << padCoords.first << " " << padCoords.second;
 		ostringstream pc2;
-		padCoords = physics.getPaddleCoordinates(1);
+		padCoords = physics.getPaddleCoordinates(2);
 		pc2 << "p l " << padCoords.first << " " << padCoords.second;
 		ostringstream pc3;
-		padCoords = physics.getPaddleCoordinates(2);
+		padCoords = physics.getPaddleCoordinates(3);
 		pc3 << "p r " << padCoords.first << " " << padCoords.second;
 		ostringstream pc4;
-		padCoords = physics.getPaddleCoordinates(3);
+		padCoords = physics.getPaddleCoordinates(1);
 		pc4 << "p b " << padCoords.first << " " << padCoords.second;
 
 
+		//Sending all of this to the client
 		vector<int> clientIDs = server.getClientIDs();
 		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
-			server.wsSend(clientIDs[i], score.str());
+			//Moving ball
 			server.wsSend(clientIDs[i], ballCoordinates.str());
+
+			//Setting scores
+			server.wsSend(clientIDs[i], score.str());
+
+			//Changing paddle positions
 			server.wsSend(clientIDs[i], pc1.str()); //top paddle coordinates
 			server.wsSend(clientIDs[i], pc2.str()); //left paddle coordinates
 			server.wsSend(clientIDs[i], pc3.str()); //right paddle coordinates

@@ -43,12 +43,12 @@
     	<tr>
     		<td></td>
     		<td align='middle'><label id='username1' name='username'>No Player</label><br>Score:<br>
-    			<label id='playerScore' name='playerScore'>0</label></td>
+    			<label id='playerScore1' name='playerScore'>0</label></td>
     		<td></td>
     	</tr>
     	<tr>
     		<td align='middle'><label id='username2' name='username'>No Player</label><br>Score:<br>
-    			<label id='playerScore' name='playerScore'>0</label></td>
+    			<label id='playerScore3' name='playerScore'>0</label></td>
 
     		<td>
     			<div id='gamebody'>
@@ -61,12 +61,12 @@
 			</td>
 
     		<td align='middle'><label id='username3' name='username'>No Player</label><br>Score:<br>
-    			<label id='playerScore' name='playerScore'>0</label></td>
+    			<label id='playerScore4' name='playerScore'>0</label></td>
     	</tr>
     	<tr>
     		<td></td>
-    		<td align='middle'><label id='username4' name='username'>No Player</label><br>Score:<br>
-    			<label id='playerScore' name='playerScore'>0</label></td>
+    		<td align='middle'><label id='username1' name='username'>No Player</label><br>Score:<br>
+    			<label id='playerScore2' name='playerScore'>0</label></td>
     		<td></td>
     	</tr>
     </table>
@@ -89,7 +89,7 @@
 			//console.log(text);
 			if (text != ""){
 				if (text[0] == "s"){ //s for score
-					document.getElementById('playerScore').textContent=text.slice(2);
+					setPlayerScore(text);
 				}
 				if (text[0] == "u"){ //u for username
 					if (text == "u get"){
@@ -166,13 +166,13 @@
 			if (text[1] == "0"){
 				document.getElementById('username1').textContent = user;
 			}
-			if (text[1] == "1"){
+			if (text[1] == "2"){
 				document.getElementById('username2').textContent = user;
 			}
-			if (text[1] == "2"){
+			if (text[1] == "3"){
 				document.getElementById('username3').textContent = user;
 			}
-			if (text[1] == "3"){
+			if (text[1] == "1"){
 				document.getElementById('username4').textContent = user;
 			}
 			console.log(text);
@@ -184,22 +184,29 @@
     		console.log(text);
     		if (splitCommand[1] == "t"){ //paddle is the top
 	    		paddle = document.getElementById('top-paddle');
-	    		paddle.style.left = splitCommand[2] + 'px';
     		}
     		if (splitCommand[1] == "l"){ //paddle is the left
 	    		paddle = document.getElementById('left-paddle');
-	    		paddle.style.top = splitCommand[3] + 'px';
     		}
     		if (splitCommand[1] == "r"){ //paddle is the right
 	    		paddle = document.getElementById('right-paddle');
-	    		paddle.style.top = splitCommand[3] + 'px';
     		}
     		if (splitCommand[1] == "b"){ //paddle is the bottom
 	    		paddle = document.getElementById('bottom-paddle');
-	    		paddle.style.left = splitCommand[2] + 'px';
     		}
 
-    		// paddle.style.top = splitCommand[3] + 'px';
+    		paddle.style.left = splitCommand[2] + 'px';
+    		paddle.style.top = splitCommand[3] + 'px';
+    	}
+
+    	function setPlayerScore(text){
+    		var scores = text.split(" "); //scores[0] == "s"
+    		//document.getElementById('playerScore').textContent=text.slice(2);
+    		document.getElementById('playerScore1').textContent=scores[1];
+    		document.getElementById('playerScore2').textContent=scores[2];
+    		document.getElementById('playerScore3').textContent=scores[3];
+    		document.getElementById('playerScore4').textContent=scores[4];
+    		console.log(scores);
     	}
 
 
