@@ -98,7 +98,7 @@ void periodicHandler() {
 		score << "s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " << 
 			physics.getPlayerScore(2) << " "<< physics.getPlayerScore(3);
 
-		if (server.getGameRoomMap()[1].size() >= 1) {
+		if (server.getGameRoomMap()[1].size() >= 4) {
 			physics.moveBall(8);
 		}
 		ostringstream ballCoordinates;
