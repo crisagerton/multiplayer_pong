@@ -75,6 +75,7 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	ballCoordinates.second += movementSpeed * sin(ballAngle * PI / 180);
 }
 
+
 void PongPhysicsEngine::movePaddle(int i, int dir, double movementSpeed) {
 	// Depends which paddle this is
 	if (i == 0 || i == 1) {
@@ -90,6 +91,7 @@ void PongPhysicsEngine::movePaddle(int i, int dir, double movementSpeed) {
 		}
 	}
 }
+
 
 std::pair<double, double> PongPhysicsEngine::getPaddleCoordinates(int i) {
 	return paddleCoordinates[i];

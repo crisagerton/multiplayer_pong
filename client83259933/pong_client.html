@@ -106,9 +106,7 @@
 					ball.style.top = splitCommand[2] + 'px';
 				}
 				if (text[0] == "p"){//p for player paddle
-					var paddle = document.getElementById('top-paddle');
-					var splitCommand = text.split(" ");
-					paddle.style.left = splitCommand[1] + 'px';
+					handlePlayerMovement(text);
 				}
 				if (text[0] == "c"){//print to console (for testing purposes)
 					console.log(text);
@@ -178,6 +176,30 @@
 				document.getElementById('username4').textContent = user;
 			}
 			console.log(text);
+    	}
+
+    	function handlePlayerMovement(text){
+    		var paddle;// = document.getElementById('top-paddle');;
+    		var splitCommand = text.split(" ");
+    		console.log(text);
+    		if (splitCommand[1] == "t"){ //paddle is the top
+	    		paddle = document.getElementById('top-paddle');
+	    		paddle.style.left = splitCommand[2] + 'px';
+    		}
+    		if (splitCommand[1] == "l"){ //paddle is the left
+	    		paddle = document.getElementById('left-paddle');
+	    		paddle.style.top = splitCommand[3] + 'px';
+    		}
+    		if (splitCommand[1] == "r"){ //paddle is the right
+	    		paddle = document.getElementById('right-paddle');
+	    		paddle.style.top = splitCommand[3] + 'px';
+    		}
+    		if (splitCommand[1] == "b"){ //paddle is the bottom
+	    		paddle = document.getElementById('bottom-paddle');
+	    		paddle.style.left = splitCommand[2] + 'px';
+    		}
+
+    		// paddle.style.top = splitCommand[3] + 'px';
     	}
 
 
