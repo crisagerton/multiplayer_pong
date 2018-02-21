@@ -65,7 +65,7 @@
     	</tr>
     	<tr>
     		<td></td>
-    		<td align='middle'><label id='username1' name='username'>No Player</label><br>Score:<br>
+    		<td align='middle'><label id='username4' name='username'>No Player</label><br>Score:<br>
     			<label id='playerScore2' name='playerScore'>0</label></td>
     		<td></td>
     	</tr>
@@ -162,7 +162,6 @@
 
     	function displayUsernames(text){
 			var user = text.slice(3);//splitCommand[1];
-
 			if (text[1] == "0"){
 				document.getElementById('username1').textContent = user;
 			}
@@ -181,7 +180,6 @@
     	function handlePlayerMovement(text){
     		var paddle;// = document.getElementById('top-paddle');;
     		var splitCommand = text.split(" ");
-    		console.log(text);
     		if (splitCommand[1] == "t"){ //paddle is the top
 	    		paddle = document.getElementById('top-paddle');
     		}
@@ -206,7 +204,6 @@
     		document.getElementById('playerScore2').textContent=scores[2];
     		document.getElementById('playerScore3').textContent=scores[3];
     		document.getElementById('playerScore4').textContent=scores[4];
-    		console.log(scores);
     	}
 
 

@@ -46,13 +46,18 @@ void closeHandler(int clientID) {
 	ostringstream resetUsername;
 	resetUsername << "u" << clientID << " No Player";
 
+	cout << "Client " << clientID << " has left the server" << endl;
+	cout << "Remaining clients: ";
 	vector<int> clientIDs = server.getClientIDsWithSamePortAs(clientID);
 	for (int i = 0; i < clientIDs.size(); i++) {
 		if (clientIDs[i] != clientID) {
+			cout << clientIDs[i] << ", ";
 			server.wsSend(clientIDs[i], os.str());
 			server.wsSend(clientIDs[i], resetUsername.str());
 		}
 	}
+	cout << endl;
+
 	physics.resetTo(70, 94, 177, 494, 577);
 }
 
@@ -73,7 +78,7 @@ void messageHandler(int clientID, string message) {
 		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
 			ostringstream os;
 			os << "u" << clientID << " " << message.substr(2);
-			cout << os.str() << endl;
+			//cout << os.str() << endl;
 			server.wsSend(clientIDs[i], os.str());
 		}
 	}

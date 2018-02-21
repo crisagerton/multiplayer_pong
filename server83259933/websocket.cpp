@@ -357,12 +357,15 @@ void webSocket::wsRemoveClient(int clientID) {
 	socketIDmap.erase(wsClients[clientID]->socket);
 	int clientPort = portClientMap[clientID];
 	portClientMap.erase(clientID);
-	vector<int> gameRoom;
-	for (int i = 0; i < gameRoom.size(); i++) {
-		if (gameRoomMap[clientPort][i] != clientID)
-			gameRoom[i] = gameRoomMap[clientPort][i];
+
+	vector<int> currentGameRoom = gameRoomMap[clientPort];
+	vector<int> newGameRoom;
+	for (int i = 0; i < currentGameRoom.size(); i++) {
+		if (currentGameRoom[i] != clientID)
+			newGameRoom.push_back(currentGameRoom[i]);
 	}
-	gameRoomMap[clientPort] = gameRoom;
+	gameRoomMap[clientPort] = newGameRoom;
+	cout << endl << "Game Room Size (after removing client): " << gameRoomMap[clientPort].size() << endl;
 	
 	wsClients[clientID] = NULL;
 	delete client;
@@ -686,7 +689,7 @@ void webSocket::wsAddClient(int socket, in_addr ip, int port) {
 	socketIDmap[socket] = clientID;
 	portClientMap[clientID] = port;
 	gameRoomMap[port].push_back(clientID);
-	cout << gameRoomMap[port].size() << endl;
+	cout << "Game Room Size (after adding client): " << gameRoomMap[port].size() << endl;
 }
 
 void webSocket::setOpenHandler(defaultCallback callback) {
