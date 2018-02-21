@@ -58,19 +58,18 @@ void closeHandler(int clientID) {
 
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message) {
-<<<<<<< HEAD
+
 	server.wsSend(clientID, message);
 	int y = 0;
 	if (message == "10") { y = 2; }
 	if (message == "-10") { y = -2; }
-	physics.movePaddle(0, y, 5);
-=======
+
 	//server.wsSend(clientID, message);
 	int changeXorYby = 0;
 	if (message == "10") { changeXorYby = 2; }
 	if (message == "-10") { changeXorYby = -2; }
 	physics.movePaddle(clientID, changeXorYby, 5); //call with clientID
->>>>>>> origin/master
+
 
 	//add usernames to storage
 	if (message.substr(0,1) == "u") {
@@ -100,7 +99,6 @@ void periodicHandler() {
 	if (currenttime == 5) {
 		physics.timer = 0;
 		ostringstream os;
-		std::pair<double, double> paddleCoords = physics.getPaddleCoordinates(0);
 		ostringstream score;
 		score << "s " << physics.getPlayerScore(0);
 
@@ -111,11 +109,6 @@ void periodicHandler() {
 		std::pair<double, double> ballCoords = physics.getBallCoordinates();
 		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
 
-<<<<<<< HEAD
-		ostringstream pc;
-		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
-		pc << "p " << padCoords.first << " " << padCoords.second;
-=======
 		ostringstream pc1;
 		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
 		pc1 << "p t " << padCoords.first << " " << padCoords.second;
@@ -128,7 +121,7 @@ void periodicHandler() {
 		ostringstream pc4;
 		padCoords = physics.getPaddleCoordinates(3);
 		pc4 << "p b " << padCoords.first << " " << padCoords.second;
->>>>>>> origin/master
+
 
 		vector<int> clientIDs = server.getClientIDs();
 		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages

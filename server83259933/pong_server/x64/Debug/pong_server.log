@@ -1,7 +1,5 @@
-﻿  PongPhysicsEngine.cpp
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.cpp(85): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.cpp(91): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.cpp(97): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\crystal\documents\ics 167\multiplayer_pong\server83259933\pongphysicsengine.cpp(103): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-  pong_server.vcxproj -> C:\Users\Crystal\Documents\ICS 167\multiplayer_pong\server83259933\x64\Debug\pong_server.exe
+﻿  main.cpp
+c:\users\richard\documents\github\multiplayer_pong\server83259933\pongphysicsengine.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\richard\documents\github\multiplayer_pong\server83259933\pongphysicsengine.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  LINK : C:\Users\Richard\Documents\GitHub\multiplayer_pong\server83259933\x64\Debug\pong_server.exe not found or not built by the last incremental link; performing full link
+  pong_server.vcxproj -> C:\Users\Richard\Documents\GitHub\multiplayer_pong\server83259933\x64\Debug\pong_server.exe
