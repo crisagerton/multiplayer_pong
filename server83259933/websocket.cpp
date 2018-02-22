@@ -365,7 +365,8 @@ void webSocket::wsRemoveClient(int clientID) {
 			newGameRoom.push_back(currentGameRoom[i]);
 	}
 	gameRoomMap[clientPort] = newGameRoom;
-	cout << endl << "Game Room Size (after removing client): " << gameRoomMap[clientPort].size() << endl;
+	cout << "Client Disconnected." << endl;
+	cout << "Game Room Size (after removing client): " << gameRoomMap[clientPort].size() << endl;
 	
 	wsClients[clientID] = NULL;
 	delete client;

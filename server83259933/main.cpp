@@ -6,6 +6,7 @@
 #include <random>
 #include "websocket.h"
 #include "PongPhysicsEngine.h"
+#define INTERVAL_MS 10
 
 using namespace std;
 
@@ -14,6 +15,7 @@ webSocket server;
 //default_random_engine engine{ device() };
 //uniform_int_distribution<int> distribution{ 0, 360 };
 PongPhysicsEngine physics = PongPhysicsEngine(70, 94, 177, 494, 577);
+int interval_clocks = CLOCKS_PER_SEC * INTERVAL_MS / 1000;
 
 /* called when a client connects */
 void openHandler(int clientID) {
@@ -86,16 +88,59 @@ void messageHandler(int clientID, string message) {
 
 /* called once per select() loop */
 void periodicHandler() {
-	static time_t next = time(NULL) + 1;
-	time_t current = time(NULL);
+	static clock_t next = clock() + interval_clocks;
+	clock_t current = clock();
 
 	int currenttime = physics.timer;
 	physics.timer++;
 
 	if (current >= next) {
-		next = time(NULL) + 1;
-	}
+		//physics.timer = 0;
+		ostringstream os;
+		ostringstream score;
+		score << "s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " <<
+			physics.getPlayerScore(2) << " " << physics.getPlayerScore(3);
 
+		if (server.getGameRoomMap()[1].size() >= 4) {
+			physics.moveBall(4);
+		}
+		ostringstream ballCoordinates;
+		std::pair<double, double> ballCoords = physics.getBallCoordinates();
+		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
+
+		ostringstream pc1;
+		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
+		pc1 << "p t " << padCoords.first << " " << padCoords.second;
+		ostringstream pc2;
+		padCoords = physics.getPaddleCoordinates(2);
+		pc2 << "p l " << padCoords.first << " " << padCoords.second;
+		ostringstream pc3;
+		padCoords = physics.getPaddleCoordinates(3);
+		pc3 << "p r " << padCoords.first << " " << padCoords.second;
+		ostringstream pc4;
+		padCoords = physics.getPaddleCoordinates(1);
+		pc4 << "p b " << padCoords.first << " " << padCoords.second;
+
+
+		//Sending all of this to the client
+		vector<int> clientIDs = server.getClientIDs();
+		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
+													 //Moving ball
+			server.wsSend(clientIDs[i], ballCoordinates.str());
+
+			//Setting scores
+			server.wsSend(clientIDs[i], score.str());
+
+			//Changing paddle positions
+			server.wsSend(clientIDs[i], pc1.str()); //top paddle coordinates
+			server.wsSend(clientIDs[i], pc2.str()); //left paddle coordinates
+			server.wsSend(clientIDs[i], pc3.str()); //right paddle coordinates
+			server.wsSend(clientIDs[i], pc4.str()); //bottom paddle coordinates
+		}
+
+		next = clock() + interval_clocks;
+	}
+	/*
 	if (currenttime == 5) {
 		physics.timer = 0;
 		ostringstream os;
@@ -139,7 +184,7 @@ void periodicHandler() {
 			server.wsSend(clientIDs[i], pc3.str()); //right paddle coordinates
 			server.wsSend(clientIDs[i], pc4.str()); //bottom paddle coordinates
 		}
-	}
+	}*/
 }
 
 int main(int argc, char *argv[]) {

@@ -32,35 +32,43 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 	if ((ballCoordinates.second <= paddleCoordinates[0].second + 10) &&
 		(ballMaxCoordX >= paddleCoordinates[0].first) && (ballCoordinates.first <= paddleCoordinates[0].first + 100) && currentYMovement < 0) {
 		// Top Paddle
-		playerScores[0] += 1;
+		//playerScores[0] += 1;
 		ballAngle = 360 - ballAngle;
+		paddleLastTouched = 0;
 	} else if ((ballMaxCoordY >= paddleCoordinates[1].second) &&
 		(ballMaxCoordX >= paddleCoordinates[1].first) && (ballCoordinates.first <= paddleCoordinates[1].first + 100) && currentYMovement > 0) {
 		// Bot Paddle
-		playerScores[1] += 1;
+		//playerScores[1] += 1;
 		ballAngle = 360 - ballAngle;
+		paddleLastTouched = 1;
 	} else if ((ballCoordinates.second <= paddleCoordinates[2].second + 100) &&
 		(ballMaxCoordY >= paddleCoordinates[2].second) && (ballCoordinates.first <= paddleCoordinates[2].first + 10) && currentXMovement < 0) {
 		// Left Paddle
-		playerScores[2] += 1;
+		//playerScores[2] += 1;
 		ballAngle = 180 - ballAngle;
+		paddleLastTouched = 2;
 	} else if ((ballCoordinates.second <= paddleCoordinates[3].second + 100) &&
 		(ballMaxCoordY >= paddleCoordinates[3].second) && (ballMaxCoordX >= paddleCoordinates[3].first) && currentXMovement > 0) {
 		// Right Paddle
-		playerScores[3] += 1;
+		//playerScores[3] += 1;
 		ballAngle = 180 - ballAngle;
+		paddleLastTouched = 3;
 	} else if (ballCoordinates.second <= screenYMin && currentYMovement < 0) {
 		// Top Wall
 		ballAngle = 360 - ballAngle;
+		playerScores[paddleLastTouched] += 1;
 	}  else if (ballMaxCoordY >= screenYMax && currentYMovement > 0) {
 		// Bot Wall
 		ballAngle = 360 - ballAngle;
+		playerScores[paddleLastTouched] += 1;
 	} else if (ballCoordinates.first <= screenXMin && currentXMovement < 0) {
 		// Left Wall
 		ballAngle = 180 - ballAngle;
+		playerScores[paddleLastTouched] += 1;
 	} else if (ballMaxCoordX >= screenXMax && currentXMovement > 0) {
 		// Right Wall
 		ballAngle = 180 - ballAngle;
+		playerScores[paddleLastTouched] += 1;
 	}
 
 	ballCoordinates.first += movementSpeed * cos(ballAngle * PI / 180);
@@ -81,7 +89,7 @@ void PongPhysicsEngine::movePaddle(int i, int dir, double movementSpeed) {
 		if (newY >= screenYMin && newY <= (screenYMax - 90)) {
 			paddleCoordinates[i].second += dir * movementSpeed;
 		}
-		std::cout << paddleCoordinates[i].first << " " << paddleCoordinates[i].second << std::endl;
+		//std::cout << paddleCoordinates[i].first << " " << paddleCoordinates[i].second << std::endl;
 	}
 }
 
