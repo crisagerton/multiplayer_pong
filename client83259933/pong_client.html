@@ -209,18 +209,8 @@
 
 
 	//////////GAME STUFF/////////
-		var borderLeft = 0;
-		var borderRight = 600;
-		var borderTop = 0;
-		var borderBottom = 600;
-
-		var topPaddle = document.getElementById('top-paddle');
-		var topPaddleX = 245;
-		var topPaddleHeight = 200;
-		var topPaddleDirection = 0;
-		var topPaddleTimer;
-
-		// topPaddle.style.left = 245 + 'px';
+		var PaddleDirection = 0;
+		var PaddleTimer;
 
 		var ball = document.getElementById('ball');
 		var ballRadius = 20;
@@ -234,37 +224,34 @@
 			ball.style.top += y;
 		}
 
-		function moveBottomPaddle(){
-			var newX = bottomPaddleX + bottomPaddleDirection;
-			if (newX > 90 && newX < 400){
-				// topPaddleX += topPaddleDirection;
-				// topPaddle.style.left = topPaddleX + 'px';
-				send(bottomPaddleDirection);
-			}
-		}
-
-		function moveTopPaddle(){
-			var newX = topPaddleX + topPaddleDirection;
-			if (newX > 90 && newX < 400){
-				// topPaddleX += topPaddleDirection;
-				// topPaddle.style.left = topPaddleX + 'px';
-				send(topPaddleDirection);
-			}
-			//console.log(topPaddle.style.left)
+		function movePaddle(){
+			send(PaddleDirection);
 		}
 
 		function movePlayerPaddle(e){
 			switch (e.code){
+				case 'ArrowUp':
+					if (!PaddleTimer){
+						PaddleDirection = -10;
+						PaddleTimer = setInterval(movePaddle, 50);
+					}
+					break;
 				case 'ArrowRight':
-					if (!topPaddleTimer){
-						topPaddleDirection = 10;
-						topPaddleTimer = setInterval(moveTopPaddle, 50);
+					if (!PaddleTimer){
+						PaddleDirection = 10;
+						PaddleTimer = setInterval(movePaddle, 50);
+					}
+					break;
+				case 'ArrowDown':
+					if (!PaddleTimer){
+						PaddleDirection = 10;
+						PaddleTimer = setInterval(movePaddle, 50);
 					}
 					break;
 				case 'ArrowLeft':
-					if (!topPaddleTimer){
-						topPaddleDirection = -10;
-						topPaddleTimer = setInterval(moveTopPaddle, 50);
+					if (!PaddleTimer){
+						PaddleDirection = -10;
+						PaddleTimer = setInterval(movePaddle, 50);
 					}
 					break;
 			}
@@ -272,10 +259,12 @@
 
 		function stopPlayerPaddle(e){
 			switch (e.code){
+				case 'ArrowUp':
+				case 'ArrowDown':
 				case 'ArrowRight':
 				case 'ArrowLeft':
-					clearInterval(topPaddleTimer);
-					topPaddleTimer = null;
+					clearInterval(PaddleTimer);
+					PaddleTimer = null;
 					send(""); //no input
 					break;
 			}

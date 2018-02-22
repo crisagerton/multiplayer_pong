@@ -70,17 +70,18 @@ void PongPhysicsEngine::moveBall(double movementSpeed) {
 
 void PongPhysicsEngine::movePaddle(int i, int dir, double movementSpeed) {
 	// Depends which paddle this is
-	if (i == 0 || i == 1) { //top or bottom
+	if (i == 0 || i == 1) { //top or bottom paddles
 		int newX = paddleCoordinates[i].first + (dir * movementSpeed);
 		if (newX > screenXMin && newX < (screenXMax - 90)) {
 			paddleCoordinates[i].first += dir * movementSpeed;
 		}
 	}
-	else if (i == 2 || i == 3) { //left or right
+	else if (i == 2 || i == 3) { //left or right paddles
 		int newY = paddleCoordinates[i].second + (dir * movementSpeed);
-		if (newY > screenYMin && newY < (screenYMax - 90)) {
+		if (newY >= screenYMin && newY <= (screenYMax - 90)) {
 			paddleCoordinates[i].second += dir * movementSpeed;
 		}
+		std::cout << paddleCoordinates[i].first << " " << paddleCoordinates[i].second << std::endl;
 	}
 }
 
