@@ -86,6 +86,11 @@
 		// }
 
 		function log( text ) {
+			console.log("Received Message timestamp: " + text);
+			//console.log(text);
+			var textPieces = text.split(" "); ///list of text parts
+			var newtext = textPieces.shift();
+			text = textPieces.join(" ");
 			//console.log(text);
 			if (text != ""){
 				if (text[0] == "s"){ //s for score
@@ -108,14 +113,15 @@
 				if (text[0] == "p"){//p for player paddle
 					handlePlayerMovement(text);
 				}
-				if (text[0] == "c"){//print to console (for testing purposes)
-					console.log(text);
-				}
+				//if (text[0] == "c"){//print to console (for testing purposes)
+					//console.log(text);
+				//}
 			}
 		}
 
 		function send( text ) {
 			Server.send( 'message', text );
+			console.log("Sent Message timestamp: " + Math.floor(Date.now() / 1000));
 		}
 
         function connect(){

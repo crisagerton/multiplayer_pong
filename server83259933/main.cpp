@@ -4,6 +4,7 @@
 #include <sstream>
 #include <time.h>
 #include <random>
+#include <queue>
 #include "websocket.h"
 #include "PongPhysicsEngine.h"
 #define INTERVAL_MS 10
@@ -16,6 +17,7 @@ webSocket server;
 //uniform_int_distribution<int> distribution{ 0, 360 };
 PongPhysicsEngine physics = PongPhysicsEngine(70, 94, 177, 494, 577);
 int interval_clocks = CLOCKS_PER_SEC * INTERVAL_MS / 1000;
+queue<pair<int,string>> messageQueue;
 
 /* called when a client connects */
 void openHandler(int clientID) {
@@ -27,16 +29,20 @@ void openHandler(int clientID) {
 		if (clientIDs[i] != clientID)
 			server.wsSend(clientIDs[i], os.str());
 	}*/
-	server.wsSend(clientID, "Welcome!");
-	server.wsSend(clientID, "u get"); ///get username from client
+	//server.wsSend(clientID, "Welcome!");
+	ostringstream os;
+	os << time(0) << " u get";
+	server.wsSend(clientID, os.str()); ///get username from client
+	//messageQueue.push(std::make_pair(1, os.str()));
 
 	vector<int> clientIDs = server.getClientIDsWithSamePortAs(clientID);
 	for (int i = 0; i < clientIDs.size(); i++) {
 		if (clientIDs[i] != clientID) {
 			ostringstream os;
-			os << "u";
+			os << time(0) << " u";
 			os << clientIDs[i] << " " << server.getClientUsername(clientIDs[i]);
 			server.wsSend(clientID, os.str());
+			//messageQueue.push(std::make_pair(1, os.str()));
 		}
 	}
 }
@@ -44,9 +50,9 @@ void openHandler(int clientID) {
 /* called when a client disconnects */
 void closeHandler(int clientID) {
 	ostringstream os;
-	os << "c Stranger " << clientID << " has left.";
+	os << time(0) << " c Stranger " << clientID << " has left.";
 	ostringstream resetUsername;
-	resetUsername << "u" << clientID << " No Player";
+	resetUsername << time(0) << " u" << clientID << " No Player";
 
 	cout << "Client " << clientID << " has left the server" << endl;
 	cout << "Remaining clients: ";
@@ -79,7 +85,7 @@ void messageHandler(int clientID, string message) {
 		vector<int> clientIDs = server.getClientIDs();
 		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
 			ostringstream os;
-			os << "u" << clientID << " " << message.substr(2);
+			os << time(0)  <<" u" << clientID << " " << message.substr(2);
 			//cout << os.str() << endl;
 			server.wsSend(clientIDs[i], os.str());
 		}
@@ -98,7 +104,7 @@ void periodicHandler() {
 		//physics.timer = 0;
 		ostringstream os;
 		ostringstream score;
-		score << "s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " <<
+		score << time(0) << " s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " <<
 			physics.getPlayerScore(2) << " " << physics.getPlayerScore(3);
 
 		if (server.getGameRoomMap()[1].size() >= 4) {
@@ -106,23 +112,24 @@ void periodicHandler() {
 		}
 		ostringstream ballCoordinates;
 		std::pair<double, double> ballCoords = physics.getBallCoordinates();
-		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
+		ballCoordinates << time(0) << " b " << ballCoords.first << " " << ballCoords.second;
 
 		ostringstream pc1;
 		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
-		pc1 << "p t " << padCoords.first << " " << padCoords.second;
+		pc1 << time(0) << " p t " << padCoords.first << " " << padCoords.second;
 		ostringstream pc2;
 		padCoords = physics.getPaddleCoordinates(2);
-		pc2 << "p l " << padCoords.first << " " << padCoords.second;
+		pc2 << time(0) << " p l " << padCoords.first << " " << padCoords.second;
 		ostringstream pc3;
 		padCoords = physics.getPaddleCoordinates(3);
-		pc3 << "p r " << padCoords.first << " " << padCoords.second;
+		pc3 << time(0) <<" p r " << padCoords.first << " " << padCoords.second;
 		ostringstream pc4;
 		padCoords = physics.getPaddleCoordinates(1);
-		pc4 << "p b " << padCoords.first << " " << padCoords.second;
+		pc4 << time(0) <<" p b " << padCoords.first << " " << padCoords.second;
 
 
 		//Sending all of this to the client
+		//cout << "test " << current << endl;
 		vector<int> clientIDs = server.getClientIDs();
 		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
 													 //Moving ball
@@ -140,51 +147,6 @@ void periodicHandler() {
 
 		next = clock() + interval_clocks;
 	}
-	/*
-	if (currenttime == 5) {
-		physics.timer = 0;
-		ostringstream os;
-		ostringstream score;
-		score << "s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " << 
-			physics.getPlayerScore(2) << " "<< physics.getPlayerScore(3);
-
-		if (server.getGameRoomMap()[1].size() >= 4) {
-			physics.moveBall(8);
-		}
-		ostringstream ballCoordinates;
-		std::pair<double, double> ballCoords = physics.getBallCoordinates();
-		ballCoordinates << "b " << ballCoords.first << " " << ballCoords.second;
-
-		ostringstream pc1;
-		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
-		pc1 << "p t " << padCoords.first << " " << padCoords.second;
-		ostringstream pc2;
-		padCoords = physics.getPaddleCoordinates(2);
-		pc2 << "p l " << padCoords.first << " " << padCoords.second;
-		ostringstream pc3;
-		padCoords = physics.getPaddleCoordinates(3);
-		pc3 << "p r " << padCoords.first << " " << padCoords.second;
-		ostringstream pc4;
-		padCoords = physics.getPaddleCoordinates(1);
-		pc4 << "p b " << padCoords.first << " " << padCoords.second;
-
-
-		//Sending all of this to the client
-		vector<int> clientIDs = server.getClientIDs();
-		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
-			//Moving ball
-			server.wsSend(clientIDs[i], ballCoordinates.str());
-
-			//Setting scores
-			server.wsSend(clientIDs[i], score.str());
-
-			//Changing paddle positions
-			server.wsSend(clientIDs[i], pc1.str()); //top paddle coordinates
-			server.wsSend(clientIDs[i], pc2.str()); //left paddle coordinates
-			server.wsSend(clientIDs[i], pc3.str()); //right paddle coordinates
-			server.wsSend(clientIDs[i], pc4.str()); //bottom paddle coordinates
-		}
-	}*/
 }
 
 int main(int argc, char *argv[]) {
