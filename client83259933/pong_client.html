@@ -86,12 +86,19 @@
 		// }
 
 		function log( text ) {
-			console.log("Received Message timestamp: " + text);
-			//console.log(text);
+			///Determining latency
+			var currentTime = Date.now()
 			var textPieces = text.split(" "); ///list of text parts
-			var newtext = textPieces.shift();
-			text = textPieces.join(" ");
-			//console.log(text);
+			var serverSendingTime = textPieces.shift(); ///remove text[0]
+			if (textPieces.length >= 1 && textPieces[0] == "p"){
+			console.log("<" + currentTime + "> Message Received:\n\t" 
+				+ text);
+			console.log("Estimated Latency: " + (currentTime - serverSendingTime) + "milliseconds\n");
+			}
+			
+
+			///Processing the message and showing it in game
+			text = textPieces.join(" "); ///reconstruct string
 			if (text != ""){
 				if (text[0] == "s"){ //s for score
 					setPlayerScore(text);
@@ -121,7 +128,7 @@
 
 		function send( text ) {
 			Server.send( 'message', text );
-			console.log("Sent Message timestamp: " + Math.floor(Date.now() / 1000));
+			console.log("<" + Date.now() + "> Message Sent: " + text);
 		}
 
         function connect(){
@@ -231,7 +238,10 @@
 		}
 
 		function movePaddle(){
-			send(PaddleDirection);
+			if (PaddleDirection > 0)
+				send("paddle move +");
+			if (PaddleDirection < 0)
+				send("paddle move -");
 		}
 
 		function movePlayerPaddle(e){
@@ -271,7 +281,7 @@
 				case 'ArrowLeft':
 					clearInterval(PaddleTimer);
 					PaddleTimer = null;
-					send(""); //no input
+					send("paddle stop"); //paddle stop code
 					break;
 			}
 		}

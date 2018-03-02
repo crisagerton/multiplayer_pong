@@ -4,12 +4,13 @@
 #include <sstream>
 #include <time.h>
 #include <random>
-#include <queue>
+#include <chrono>
 #include "websocket.h"
 #include "PongPhysicsEngine.h"
 #define INTERVAL_MS 10
 
 using namespace std;
+using namespace std::chrono;
 
 webSocket server;
 //random_device device;
@@ -17,9 +18,34 @@ webSocket server;
 //uniform_int_distribution<int> distribution{ 0, 360 };
 PongPhysicsEngine physics = PongPhysicsEngine(70, 94, 177, 494, 577);
 int interval_clocks = CLOCKS_PER_SEC * INTERVAL_MS / 1000;
-queue<pair<int,string>> messageQueue;
+
+//Latency variables
 vector<pair<int, string>> latencyQueue;
-int latency = 200;
+int latency = 500;
+int minLatency = 0;
+int maxLatency = 2000;
+int incrementBy = 1;
+string latencyType; //"fixed", "random", or "incremental"
+
+int getLatency() {
+	if (latencyType == "fixed") {
+		return latency;
+	}
+	else if (latencyType == "random") {
+		//TODO: randomize the latency and return
+		return latency;
+	}
+	else if (latencyType == "incremental"){
+		if (latency < maxLatency && server.getGameRoomMap()[1].size() >= 1) {
+			latency += incrementBy;
+			return latency;
+		}
+		return latency;
+	}
+
+	return 0;
+}
+
 
 /* called when a client connects */
 void openHandler(int clientID) {
@@ -33,18 +59,18 @@ void openHandler(int clientID) {
 	}*/
 	//server.wsSend(clientID, "Welcome!");
 	ostringstream os;
-	os << time(0) << " u get";
+	os << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() 
+		<< " u get";
 	server.wsSend(clientID, os.str()); ///get username from client
-	//messageQueue.push(std::make_pair(1, os.str()));
 
 	vector<int> clientIDs = server.getClientIDsWithSamePortAs(clientID);
 	for (int i = 0; i < clientIDs.size(); i++) {
 		if (clientIDs[i] != clientID) {
 			ostringstream os;
-			os << time(0) << " u";
+			os << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()
+				<< " u";
 			os << clientIDs[i] << " " << server.getClientUsername(clientIDs[i]);
 			server.wsSend(clientID, os.str());
-			//messageQueue.push(std::make_pair(1, os.str()));
 		}
 	}
 }
@@ -52,9 +78,11 @@ void openHandler(int clientID) {
 /* called when a client disconnects */
 void closeHandler(int clientID) {
 	ostringstream os;
-	os << time(0) << " c Stranger " << clientID << " has left.";
+	os << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() 
+		<< " c Stranger " << clientID << " has left.";
 	ostringstream resetUsername;
-	resetUsername << time(0) << " u" << clientID << " No Player";
+	resetUsername << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()
+		<< " u" << clientID << " No Player";
 
 	cout << "Client " << clientID << " has left the server" << endl;
 	cout << "Remaining clients: ";
@@ -71,15 +99,47 @@ void closeHandler(int clientID) {
 	physics.resetTo(70, 94, 177, 494, 577);
 }
 
+
+void addMovementMessageToLatencyQueue(int clientID) {
+	ostringstream pc; ///paddle coordinates
+	std::pair<double, double> padCoords;
+
+	pc << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+
+	switch (clientID) {
+	case 0:
+		padCoords = physics.getPaddleCoordinates(0);
+		pc << " p t " << padCoords.first << " " << padCoords.second;
+		break;
+	case 1:
+		padCoords = physics.getPaddleCoordinates(1);
+		pc << " p b " << padCoords.first << " " << padCoords.second;
+		break;
+	case 2:
+		padCoords = physics.getPaddleCoordinates(2);
+		pc << " p l " << padCoords.first << " " << padCoords.second;
+		break;
+	case 3:
+		padCoords = physics.getPaddleCoordinates(3);
+		pc << " p r " << padCoords.first << " " << padCoords.second;
+		break;
+	}
+	latencyQueue.push_back(make_pair(
+		duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() + getLatency(), 
+		pc.str()));
+}
+
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message) {
 
-	//server.wsSend(clientID, message);
-	int changeXorYby = 0;
-	if (message == "10") { changeXorYby = 2; }
-	if (message == "-10") { changeXorYby = -2; }
-	physics.movePaddle(clientID, changeXorYby, 5); //call with clientID
-
+	if (message.substr(0, 1) == "p") {
+		int changeXorYby = 0;
+		if (message == "paddle move +") { changeXorYby = 2; }
+		if (message == "paddle move -") { changeXorYby = -2; }
+		///otherwise it's "paddle stop" so changeXorYby = 0;
+		physics.movePaddle(clientID, changeXorYby, 5); //call with clientID
+		addMovementMessageToLatencyQueue(clientID);
+	}
 
 	//add usernames to storage
 	if (message.substr(0,1) == "u") {
@@ -87,12 +147,14 @@ void messageHandler(int clientID, string message) {
 		vector<int> clientIDs = server.getClientIDs();
 		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
 			ostringstream os;
-			os << time(0)  <<" u" << clientID << " " << message.substr(2);
+			os << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()
+				<<" u" << clientID << " " << message.substr(2);
 			//cout << os.str() << endl;
 			server.wsSend(clientIDs[i], os.str());
 		}
 	}
 }
+
 
 /* called once per select() loop */
 void periodicHandler() {
@@ -104,38 +166,40 @@ void periodicHandler() {
 
 	if (current >= next) {
 		//physics.timer = 0;
+		int systemTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 		ostringstream os;
 		ostringstream score;
-		score << time(0) << " s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " <<
+		score << systemTime << " s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " <<
 			physics.getPlayerScore(2) << " " << physics.getPlayerScore(3);
+		latencyQueue.push_back(make_pair(systemTime + getLatency(), score.str()));
 
 		if (server.getGameRoomMap()[1].size() >= 4) {
 			physics.moveBall(4);
 		}
 		ostringstream ballCoordinates;
 		std::pair<double, double> ballCoords = physics.getBallCoordinates();
-		ballCoordinates << time(0) << " b " << ballCoords.first << " " << ballCoords.second;
-		latencyQueue.push_back(make_pair(current + latency, ballCoordinates.str()));
+		ballCoordinates << systemTime << " b " << ballCoords.first << " " << ballCoords.second;
+		latencyQueue.push_back(make_pair(systemTime + getLatency(), ballCoordinates.str()));
 
-		ostringstream pc1;
-		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
-		pc1 << time(0) << " p t " << padCoords.first << " " << padCoords.second;
-		latencyQueue.push_back(make_pair(current + latency, pc1.str()));
+		//ostringstream pc1;
+		//std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
+		//pc1 << systemTime << " p t " << padCoords.first << " " << padCoords.second;
+		////latencyQueue.push_back(make_pair(current + latency, pc1.str()));
 
-		ostringstream pc2;
-		padCoords = physics.getPaddleCoordinates(2);
-		pc2 << time(0) << " p l " << padCoords.first << " " << padCoords.second;
-		latencyQueue.push_back(make_pair(current + latency, pc2.str()));
+		//ostringstream pc2;
+		//padCoords = physics.getPaddleCoordinates(2);
+		//pc2 << systemTime << " p l " << padCoords.first << " " << padCoords.second;
+		////latencyQueue.push_back(make_pair(current + latency, pc2.str()));
 
-		ostringstream pc3;
-		padCoords = physics.getPaddleCoordinates(3);
-		pc3 << time(0) <<" p r " << padCoords.first << " " << padCoords.second;
-		latencyQueue.push_back(make_pair(current + latency, pc3.str()));
+		//ostringstream pc3;
+		//padCoords = physics.getPaddleCoordinates(3);
+		//pc3 << systemTime <<" p r " << padCoords.first << " " << padCoords.second;
+		////latencyQueue.push_back(make_pair(current + latency, pc3.str()));
 
-		ostringstream pc4;
-		padCoords = physics.getPaddleCoordinates(1);
-		pc4 << time(0) <<" p b " << padCoords.first << " " << padCoords.second;
-		latencyQueue.push_back(make_pair(current + latency, pc4.str()));
+		//ostringstream pc4;
+		//padCoords = physics.getPaddleCoordinates(1);
+		//pc4 << systemTime <<" p b " << padCoords.first << " " << padCoords.second;
+		////latencyQueue.push_back(make_pair(current + latency, pc4.str()));
 
 
 		//Sending all of this to the client
@@ -157,9 +221,9 @@ void periodicHandler() {
 		}*/
 		
 		for (int i = 0; i < latencyQueue.size(); i++) {
-			if (latencyQueue[i].first <= current) {
+			if (latencyQueue[i].first <= systemTime) {
 				for (int j = 0; j < clientIDs.size(); j++) {
-					server.wsSend(clientIDs[j], latencyQueue[j].second);
+					server.wsSend(clientIDs[j], latencyQueue[i].second);
 				}
 
 				latencyQueue.erase(latencyQueue.begin() + i);
@@ -171,8 +235,14 @@ void periodicHandler() {
 }
 
 int main(int argc, char *argv[]) {
+	/* Setting latency: 
+	uncomment one and comment the others
+	to test different types of latency*/
+	//latencyType = "fixed";
+	//latencyType = "random";
+	latencyType = "incremental"; latency = minLatency;
 
-	//int ports[4] = { 8000,8001,8002,8003 };
+	/* set ports */
 	int ports[1] = { 8000 };
 	
 	/* set event handler */
