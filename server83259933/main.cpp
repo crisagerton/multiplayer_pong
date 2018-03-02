@@ -18,6 +18,8 @@ webSocket server;
 PongPhysicsEngine physics = PongPhysicsEngine(70, 94, 177, 494, 577);
 int interval_clocks = CLOCKS_PER_SEC * INTERVAL_MS / 1000;
 queue<pair<int,string>> messageQueue;
+vector<pair<int, string>> latencyQueue;
+int latency = 200;
 
 /* called when a client connects */
 void openHandler(int clientID) {
@@ -113,24 +115,33 @@ void periodicHandler() {
 		ostringstream ballCoordinates;
 		std::pair<double, double> ballCoords = physics.getBallCoordinates();
 		ballCoordinates << time(0) << " b " << ballCoords.first << " " << ballCoords.second;
+		latencyQueue.push_back(make_pair(current + latency, ballCoordinates.str()));
 
 		ostringstream pc1;
 		std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
 		pc1 << time(0) << " p t " << padCoords.first << " " << padCoords.second;
+		latencyQueue.push_back(make_pair(current + latency, pc1.str()));
+
 		ostringstream pc2;
 		padCoords = physics.getPaddleCoordinates(2);
 		pc2 << time(0) << " p l " << padCoords.first << " " << padCoords.second;
+		latencyQueue.push_back(make_pair(current + latency, pc2.str()));
+
 		ostringstream pc3;
 		padCoords = physics.getPaddleCoordinates(3);
 		pc3 << time(0) <<" p r " << padCoords.first << " " << padCoords.second;
+		latencyQueue.push_back(make_pair(current + latency, pc3.str()));
+
 		ostringstream pc4;
 		padCoords = physics.getPaddleCoordinates(1);
 		pc4 << time(0) <<" p b " << padCoords.first << " " << padCoords.second;
+		latencyQueue.push_back(make_pair(current + latency, pc4.str()));
 
 
 		//Sending all of this to the client
 		//cout << "test " << current << endl;
 		vector<int> clientIDs = server.getClientIDs();
+		/*
 		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
 													 //Moving ball
 			server.wsSend(clientIDs[i], ballCoordinates.str());
@@ -143,6 +154,16 @@ void periodicHandler() {
 			server.wsSend(clientIDs[i], pc2.str()); //left paddle coordinates
 			server.wsSend(clientIDs[i], pc3.str()); //right paddle coordinates
 			server.wsSend(clientIDs[i], pc4.str()); //bottom paddle coordinates
+		}*/
+		
+		for (int i = 0; i < latencyQueue.size(); i++) {
+			if (latencyQueue[i].first <= current) {
+				for (int j = 0; j < clientIDs.size(); j++) {
+					server.wsSend(clientIDs[j], latencyQueue[j].second);
+				}
+
+				latencyQueue.erase(latencyQueue.begin() + i);
+			}
 		}
 
 		next = clock() + interval_clocks;
