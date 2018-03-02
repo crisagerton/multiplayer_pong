@@ -27,12 +27,16 @@ int maxLatency = 2000;
 int incrementBy = 1;
 string latencyType; //"fixed", "random", or "incremental"
 
+random_device device;
+default_random_engine engine{ device() };
+uniform_int_distribution<int> distribution{ minLatency, maxLatency };
+
 int getLatency() {
 	if (latencyType == "fixed") {
 		return latency;
 	}
 	else if (latencyType == "random") {
-		//TODO: randomize the latency and return
+		latency = distribution(device);
 		return latency;
 	}
 	else if (latencyType == "incremental"){
@@ -49,15 +53,6 @@ int getLatency() {
 
 /* called when a client connects */
 void openHandler(int clientID) {
-	/*ostringstream os;
-	os << "Stranger " << clientID << " has joined.";
-
-	vector<int> clientIDs = server.getClientIDsWithSamePortAs(clientID);
-	for (int i = 0; i < clientIDs.size(); i++) {
-		if (clientIDs[i] != clientID)
-			server.wsSend(clientIDs[i], os.str());
-	}*/
-	//server.wsSend(clientID, "Welcome!");
 	ostringstream os;
 	os << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() 
 		<< " u get";
@@ -238,9 +233,9 @@ int main(int argc, char *argv[]) {
 	/* Setting latency: 
 	uncomment one and comment the others
 	to test different types of latency*/
-	//latencyType = "fixed";
+	latencyType = "fixed";
 	//latencyType = "random";
-	latencyType = "incremental"; latency = minLatency;
+	//latencyType = "incremental"; latency = minLatency;
 
 	/* set ports */
 	int ports[1] = { 8000 };
