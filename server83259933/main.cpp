@@ -20,7 +20,8 @@ PongPhysicsEngine physics = PongPhysicsEngine(70, 94, 177, 494, 577);
 int interval_clocks = CLOCKS_PER_SEC * INTERVAL_MS / 1000;
 
 //Latency variables
-vector<pair<int, string>> latencyQueue;
+vector<pair<int, string>> latencyQueueSent; //stores timestamp (int) and message to be processed (string)
+vector<tuple<int, int, string>> latencyQueueReceived; //stores timestamp (int), clientID (int) and message to be processed (string)
 int latency = 500;
 int minLatency = 0;
 int maxLatency = 2000;
@@ -119,15 +120,42 @@ void addMovementMessageToLatencyQueue(int clientID) {
 		pc << " p r " << padCoords.first << " " << padCoords.second;
 		break;
 	}
-	latencyQueue.push_back(make_pair(
+	latencyQueueSent.push_back(make_pair(
 		duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() + getLatency(), 
 		pc.str()));
 }
 
+void processMessageFromClient(string message, int clientID) {
+	if (message.substr(0, 1) == "p") {
+		int changeXorYby = 0;
+		if (message == "paddle move +") { changeXorYby = 2; }
+		if (message == "paddle move -") { changeXorYby = -2; }
+		///otherwise it's "paddle stop" so changeXorYby = 0;
+		physics.movePaddle(clientID, changeXorYby, 5); //call with clientID
+		addMovementMessageToLatencyQueue(clientID);
+	}
+
+	//add usernames to storage
+	if (message.substr(0, 1) == "u") {
+		server.setClientUsername(clientID, message.substr(2));
+		vector<int> clientIDs = server.getClientIDs();
+		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
+			ostringstream os;
+			os << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()
+				<< " u" << clientID << " " << message.substr(2);
+			//cout << os.str() << endl;
+			server.wsSend(clientIDs[i], os.str());
+		}
+	}
+}
+
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message) {
+	latencyQueueReceived.push_back(make_tuple(
+		duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() + getLatency(),
+		clientID, message));
 
-	if (message.substr(0, 1) == "p") {
+	/*if (message.substr(0, 1) == "p") {
 		int changeXorYby = 0;
 		if (message == "paddle move +") { changeXorYby = 2; }
 		if (message == "paddle move -") { changeXorYby = -2; }
@@ -147,7 +175,7 @@ void messageHandler(int clientID, string message) {
 			//cout << os.str() << endl;
 			server.wsSend(clientIDs[i], os.str());
 		}
-	}
+	}*/
 }
 
 
@@ -166,7 +194,7 @@ void periodicHandler() {
 		ostringstream score;
 		score << systemTime << " s " << physics.getPlayerScore(0) << " " << physics.getPlayerScore(1) << " " <<
 			physics.getPlayerScore(2) << " " << physics.getPlayerScore(3);
-		latencyQueue.push_back(make_pair(systemTime + getLatency(), score.str()));
+		latencyQueueSent.push_back(make_pair(systemTime + getLatency(), score.str()));
 
 		if (server.getGameRoomMap()[1].size() >= 4) {
 			physics.moveBall(4);
@@ -174,7 +202,7 @@ void periodicHandler() {
 		ostringstream ballCoordinates;
 		std::pair<double, double> ballCoords = physics.getBallCoordinates();
 		ballCoordinates << systemTime << " b " << ballCoords.first << " " << ballCoords.second;
-		latencyQueue.push_back(make_pair(systemTime + getLatency(), ballCoordinates.str()));
+		latencyQueueSent.push_back(make_pair(systemTime + getLatency(), ballCoordinates.str()));
 
 		//ostringstream pc1;
 		//std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
@@ -215,13 +243,21 @@ void periodicHandler() {
 			server.wsSend(clientIDs[i], pc4.str()); //bottom paddle coordinates
 		}*/
 		
-		for (int i = 0; i < latencyQueue.size(); i++) {
-			if (latencyQueue[i].first <= systemTime) {
+		for (int i = 0; i < latencyQueueSent.size(); i++) {
+			if (latencyQueueSent[i].first <= systemTime) {
 				for (int j = 0; j < clientIDs.size(); j++) {
-					server.wsSend(clientIDs[j], latencyQueue[i].second);
+					server.wsSend(clientIDs[j], latencyQueueSent[i].second);
 				}
 
-				latencyQueue.erase(latencyQueue.begin() + i);
+				latencyQueueSent.erase(latencyQueueSent.begin() + i);
+			}
+		}
+		for (int i = 0; i < latencyQueueReceived.size(); i++) {
+			if (get<0>(latencyQueueReceived[i]) <= systemTime) {
+				for (int j = 0; j < clientIDs.size(); j++) {
+					processMessageFromClient(get<2>(latencyQueueReceived[i]), get<1>(latencyQueueReceived[i]));
+				}
+				latencyQueueReceived.erase(latencyQueueReceived.begin() + i);
 			}
 		}
 
