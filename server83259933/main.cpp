@@ -41,7 +41,7 @@ int getLatency() {
 		return latency;
 	}
 	else if (latencyType == "incremental"){
-		if (latency < maxLatency && server.getGameRoomMap()[1].size() >= 1) {
+		if (latency < maxLatency && server.getGameRoomMap()[1].size() >= 4) {
 			latency += incrementBy;
 			return latency;
 		}
