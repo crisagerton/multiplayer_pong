@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
 	<meta charset='UTF-8' />
@@ -205,9 +205,39 @@
     		if (splitCommand[1] == "b"){ //paddle is the bottom
 	    		paddle = document.getElementById('bottom-paddle');
     		}
+            
+    		if (paddle.style.left == '') {
+    		    console.log('hey');
+    		    paddle.style.left = splitCommand[2] + 'px';
+    		}
 
-    		paddle.style.left = splitCommand[2] + 'px';
-    		paddle.style.top = splitCommand[3] + 'px';
+    		if (paddle.style.top == '') {
+    		    paddle.style.top = splitCommand[3] + 'px';
+    		}
+
+    		var originalPosIntLeft = Number(paddle.style.left.substring(0, paddle.style.left.length - 2));
+    		var originalPosIntTop = Number(paddle.style.top.substring(0, paddle.style.top.length - 2));
+
+    		var nextPosIntLeft = Number(splitCommand[2]);
+    		var nextPosIntTop = Number(splitCommand[3]);
+
+    		console.log("Ori: " + originalPosIntLeft);
+    		console.log("Next: " + nextPosIntLeft);
+
+    		for (var i = 0; i < 1; i+=0.1) {
+    		    var newPosLeft = '' + (originalPosIntLeft + i * (nextPosIntLeft - originalPosIntLeft));
+    		    var newPosTop = '' + (originalPosIntTop + i * (nextPosIntTop - originalPosIntTop));
+
+    		    paddle.style.left = newPosLeft + 'px';
+    		    paddle.style.top = newPosTop + 'px';
+
+    		    console.log('After: ' + paddle.style.left);
+    		    console.log('After: ' + paddle.style.top);
+    		}
+
+
+    		//paddle.style.left = splitCommand[2] + 'px';
+    		//paddle.style.top = splitCommand[3] + 'px';
     	}
 
     	function setPlayerScore(text){
