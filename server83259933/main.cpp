@@ -56,7 +56,7 @@ int getLatency() {
 void openHandler(int clientID) {
 	ostringstream os;
 	os << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() 
-		<< " u get";
+		<< " ug" << clientID ;
 	server.wsSend(clientID, os.str()); ///get username from client
 
 	vector<int> clientIDs = server.getClientIDsWithSamePortAs(clientID);
@@ -196,7 +196,7 @@ void periodicHandler() {
 			physics.getPlayerScore(2) << " " << physics.getPlayerScore(3);
 		latencyQueueSent.push_back(make_pair(systemTime + getLatency(), score.str()));
 
-		if (server.getGameRoomMap()[1].size() >= 4) {
+		if (server.getGameRoomMap()[1].size() >= 2) { //TODO: Change back to 4
 			physics.moveBall(4);
 		}
 		ostringstream ballCoordinates;
@@ -204,45 +204,7 @@ void periodicHandler() {
 		ballCoordinates << systemTime << " b " << ballCoords.first << " " << ballCoords.second;
 		latencyQueueSent.push_back(make_pair(systemTime + getLatency(), ballCoordinates.str()));
 
-		//ostringstream pc1;
-		//std::pair<double, double> padCoords = physics.getPaddleCoordinates(0);
-		//pc1 << systemTime << " p t " << padCoords.first << " " << padCoords.second;
-		////latencyQueue.push_back(make_pair(current + latency, pc1.str()));
-
-		//ostringstream pc2;
-		//padCoords = physics.getPaddleCoordinates(2);
-		//pc2 << systemTime << " p l " << padCoords.first << " " << padCoords.second;
-		////latencyQueue.push_back(make_pair(current + latency, pc2.str()));
-
-		//ostringstream pc3;
-		//padCoords = physics.getPaddleCoordinates(3);
-		//pc3 << systemTime <<" p r " << padCoords.first << " " << padCoords.second;
-		////latencyQueue.push_back(make_pair(current + latency, pc3.str()));
-
-		//ostringstream pc4;
-		//padCoords = physics.getPaddleCoordinates(1);
-		//pc4 << systemTime <<" p b " << padCoords.first << " " << padCoords.second;
-		////latencyQueue.push_back(make_pair(current + latency, pc4.str()));
-
-
-		//Sending all of this to the client
-		//cout << "test " << current << endl;
 		vector<int> clientIDs = server.getClientIDs();
-		/*
-		for (int i = 0; i < clientIDs.size(); i++) { //sending everything to client via encoded string messages
-													 //Moving ball
-			server.wsSend(clientIDs[i], ballCoordinates.str());
-
-			//Setting scores
-			server.wsSend(clientIDs[i], score.str());
-
-			//Changing paddle positions
-			server.wsSend(clientIDs[i], pc1.str()); //top paddle coordinates
-			server.wsSend(clientIDs[i], pc2.str()); //left paddle coordinates
-			server.wsSend(clientIDs[i], pc3.str()); //right paddle coordinates
-			server.wsSend(clientIDs[i], pc4.str()); //bottom paddle coordinates
-		}*/
-		
 		for (int i = 0; i < latencyQueueSent.size(); i++) {
 			if (latencyQueueSent[i].first <= systemTime) {
 				for (int j = 0; j < clientIDs.size(); j++) {
@@ -269,8 +231,8 @@ int main(int argc, char *argv[]) {
 	/* Setting latency: 
 	uncomment one and comment the others
 	to test different types of latency*/
-	latencyType = "fixed";
-	//latencyType = "random";
+	//latencyType = "fixed";
+	latencyType = "random";
 	//latencyType = "incremental"; latency = minLatency;
 
 	/* set ports */

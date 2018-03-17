@@ -74,7 +74,11 @@
 
 	<script>
 	/////////////SERVER WORK/////////////
-		var Server;
+        var Server;
+        var playerPaddle;// = document.getElementById('top-paddle');
+        var lastPaddlePacketProcessed = 0;
+        var lastBallPacketProcessed = 0;
+        var receivedPacket;
 
 		document.addEventListener('keydown', movePlayerPaddle);
 		document.addEventListener('keyup', stopPlayerPaddle);
@@ -88,15 +92,17 @@
 		function log( text ) {
 			///Determining latency
 			var currentTime = Date.now()
-			var textPieces = text.split(" "); ///list of text parts
-			var serverSendingTime = textPieces.shift(); ///remove text[0]
+            var textPieces = text.split(" "); ///list of text parts
+            var serverSendingTime = textPieces.shift(); ///remove text[0]
+            receivedPacket = serverSendingTime;
+            //console.log("Message: " + text);
+            //console.log("current receivedPacket: " + receivedPacket);
 			if (textPieces.length >= 1 && textPieces[0] == "p"){
-			console.log("<" + currentTime + "> Message Received:\n\t" 
-				+ text);
-			console.log("Estimated Latency: " + (currentTime - serverSendingTime) + "milliseconds\n");
+			    console.log("<" + currentTime + "> Message Received:\n\t" 
+				    + text);
+			    console.log("Estimated Latency: " + (currentTime - serverSendingTime) + "milliseconds\n");
 			}
 			
-
 			///Processing the message and showing it in game
 			text = textPieces.join(" "); ///reconstruct string
 			if (text != ""){
@@ -104,18 +110,21 @@
 					setPlayerScore(text);
 				}
 				if (text[0] == "u"){ //u for username
-					if (text == "u get"){
-						setUsername(text);
+					if (text[1] == "g"){
+                        setUsername();
+                        setPlayerPaddle(text[2]);
 					}
 					else{
 						displayUsernames(text);
 					}
 				}
-				if (text[0] == "b"){//b for ball
-					var ball = document.getElementById('ball');
+                if (text[0] == "b") {//b for ball
+                    //TODO: FIX THIS
+					//var ball = document.getElementById('ball');
 					var splitCommand = text.split(" ");
-					ball.style.left = splitCommand[1] + 'px';
-					ball.style.top = splitCommand[2] + 'px';
+					//ball.style.left = splitCommand[1] + 'px';
+					//ball.style.top = splitCommand[2] + 'px';
+                    moveBall(splitCommand);
 				}
 				if (text[0] == "p"){//p for player paddle
 					handlePlayerMovement(text);
@@ -165,7 +174,24 @@
 
 
     //////////Helper Functions for Server Stuff////////
-    	function setUsername(text){
+        function setPlayerPaddle(clientIDstring) {
+            //console.log("Setting playerpaddle...");
+            //console.log(clientIDstring);
+            if (clientIDstring == "0") {
+                playerPaddle = document.getElementById('top-paddle');
+            }
+            if (clientIDstring == "2") {
+                playerPaddle = document.getElementById('left-paddle');
+            }
+            if (clientIDstring == "3") {
+                playerPaddle = document.getElementById('right-paddle');
+            }
+            if (clientIDstring == "1") {
+                playerPaddle = document.getElementById('bottom-paddle');
+            }
+        }
+
+    	function setUsername(){
 			var clientname = document.getElementById('nickname').value;
 			if (clientname == ""){
 				clientname = "Player --";
@@ -176,7 +202,7 @@
     	function displayUsernames(text){
 			var user = text.slice(3);//splitCommand[1];
 			if (text[1] == "0"){
-				document.getElementById('username1').textContent = user;
+                document.getElementById('username1').textContent = user;
 			}
 			if (text[1] == "2"){
 				document.getElementById('username2').textContent = user;
@@ -188,72 +214,119 @@
 				document.getElementById('username4').textContent = user;
 			}
 			console.log(text);
-    	}
+        }
 
     	function handlePlayerMovement(text){
-    		var paddle;// = document.getElementById('top-paddle');;
+    		var paddle;// = document.getElementById('top-paddle');
     		var splitCommand = text.split(" ");
-    		if (splitCommand[1] == "t"){ //paddle is the top
-	    		paddle = document.getElementById('top-paddle');
+            if (splitCommand[1] == "t") { //paddle is the top
+                paddle = document.getElementById('top-paddle');
     		}
     		if (splitCommand[1] == "l"){ //paddle is the left
-	    		paddle = document.getElementById('left-paddle');
+                paddle = document.getElementById('left-paddle');
     		}
     		if (splitCommand[1] == "r"){ //paddle is the right
-	    		paddle = document.getElementById('right-paddle');
+                paddle = document.getElementById('right-paddle');
     		}
     		if (splitCommand[1] == "b"){ //paddle is the bottom
-	    		paddle = document.getElementById('bottom-paddle');
-    		}
-            
-    		if (paddle.style.left == '') {
-    		    console.log('hey');
-    		    paddle.style.left = splitCommand[2] + 'px';
-    		}
+                paddle = document.getElementById('bottom-paddle');
+            }
 
-    		if (paddle.style.top == '') {
-    		    paddle.style.top = splitCommand[3] + 'px';
-    		}
+            ///Extrapolation?
+            /*
+            if (commandForPlayerPaddle(splitCommand[1]) &&
+                Number(playerPaddle.style.left.slice(0, -2)) != 0) { //&&
+                //Number(playerPaddle.style.top.slice(0, -2)) != 0) {
+                console.log("Not Processed");
+                return;
+            }*/
 
-    		var originalPosIntLeft = Number(paddle.style.left.substring(0, paddle.style.left.length - 2));
-    		var originalPosIntTop = Number(paddle.style.top.substring(0, paddle.style.top.length - 2));
+            console.log("Last Processed: " + lastPaddlePacketProcessed);
+            console.log("Processing..." + receivedPacket);
+            if (!checkNewPacket(lastPaddlePacketProcessed)) {
+                console.log("Packet " + receivedPacket + " not processed");
+                return;
+            }
+            console.log("Packet " + receivedPacket + " processed");
 
-    		var nextPosIntLeft = Number(splitCommand[2]);
-    		var nextPosIntTop = Number(splitCommand[3]);
+            //Interpolation to smooth it out
+            interpolate(paddle, splitCommand);
 
-    		console.log("Ori: " + originalPosIntLeft);
-    		console.log("Next: " + nextPosIntLeft);
-
-    		for (var i = 0; i < 1; i+=0.1) {
-    		    var newPosLeft = '' + (originalPosIntLeft + i * (nextPosIntLeft - originalPosIntLeft));
-    		    var newPosTop = '' + (originalPosIntTop + i * (nextPosIntTop - originalPosIntTop));
-
-    		    paddle.style.left = newPosLeft + 'px';
-    		    paddle.style.top = newPosTop + 'px';
-
-    		    console.log('After: ' + paddle.style.left);
-    		    console.log('After: ' + paddle.style.top);
-    		}
-
-
+            ////From the older version
     		//paddle.style.left = splitCommand[2] + 'px';
-    		//paddle.style.top = splitCommand[3] + 'px';
-    	}
+            //paddle.style.top = splitCommand[3] + 'px';
+
+            //Updating packets
+            lastPaddlePacketProcessed = receivedPacket;
+        }
+
+        function interpolate(paddle, splitCommand) {
+            console.log("Interpolating..."); //comment
+            if (paddle.style.left == '') {
+                //console.log('hey');
+                paddle.style.left = splitCommand[2] + 'px';
+            }
+
+            if (paddle.style.top == '') {
+                paddle.style.top = splitCommand[3] + 'px';
+            }
+
+            var originalPosIntLeft = Number(paddle.style.left.substring(0, paddle.style.left.length - 2));
+            var originalPosIntTop = Number(paddle.style.top.substring(0, paddle.style.top.length - 2));
+
+            var nextPosIntLeft = Number(splitCommand[2]);
+            var nextPosIntTop = Number(splitCommand[3]);
+
+            console.log("Ori: " + originalPosIntLeft);
+            console.log("Next: " + nextPosIntLeft);
+
+            for (var i = 0; i < 1; i += 0.1) {
+                var newPosLeft = '' + (originalPosIntLeft + i * (nextPosIntLeft - originalPosIntLeft));
+                var newPosTop = '' + (originalPosIntTop + i * (nextPosIntTop - originalPosIntTop));
+
+                paddle.style.left = newPosLeft + 'px';
+                paddle.style.top = newPosTop + 'px';
+
+                console.log('After: ' + paddle.style.left);
+                //console.log('After: ' + paddle.style.top);
+            }
+        }
+
+        function checkNewPacket(lastPacketProcessed) {
+            /*Checks to make sure that the packed being processed 
+            is after the packets that have been received.
+            Returns True if the packet is new and False if the packet is new.*/
+            return receivedPacket >= lastPacketProcessed;
+        }
+
+        function commandForPlayerPaddle(paddleSpecified) {
+            if (paddleSpecified == "t" && playerPaddle == document.getElementById('top-paddle'))
+                return true;
+            if (paddleSpecified == "l" && playerPaddle == document.getElementById('left-paddle'))
+                return true;
+            if (paddleSpecified == "r" && playerPaddle == document.getElementById('right-paddle'))
+                return true;
+            if (paddleSpecified == "b" && playerPaddle == document.getElementById('bottom-paddle'))
+                return true;
+            return false;
+        }
 
     	function setPlayerScore(text){
     		var scores = text.split(" "); //scores[0] == "s"
     		//document.getElementById('playerScore').textContent=text.slice(2);
-    		document.getElementById('playerScore1').textContent=scores[1];
-    		document.getElementById('playerScore2').textContent=scores[2];
-    		document.getElementById('playerScore3').textContent=scores[3];
-    		document.getElementById('playerScore4').textContent=scores[4];
-    	}
+            if (checkNewPacket(lastBallPacketProcessed)) {
+                document.getElementById('playerScore1').textContent = scores[1];
+                document.getElementById('playerScore2').textContent = scores[2];
+                document.getElementById('playerScore3').textContent = scores[3];
+                document.getElementById('playerScore4').textContent = scores[4];
+            }
+        }
 
 
 
 	//////////GAME STUFF/////////
 		var PaddleDirection = 0;
-		var PaddleTimer;
+        var PaddleTimer;
 
 		var ball = document.getElementById('ball');
 		var ballRadius = 20;
@@ -262,42 +335,74 @@
 			document.getElementById('playerScore').textContent=text;
 		}
 
-		function moveBall(x, y){
-			ball.style.left += x;
-			ball.style.top += y;
+		function moveBall(splitCommand){
+            var ball = document.getElementById('ball');
+            console.log("Last Processed: " + lastBallPacketProcessed);
+            console.log("Processing..." + receivedPacket);
+            if (checkNewPacket(lastBallPacketProcessed)) {
+                console.log("Packet " + receivedPacket + " processed");
+                ball.style.left = splitCommand[1] + 'px';
+                ball.style.top = splitCommand[2] + 'px';
+                lastBallPacketProcessed = receivedPacket;
+            }
 		}
 
-		function movePaddle(){
+        function movePaddle() {
+            console.log("Moving Paddle in Client");
+            lastPacketProcessed = Date.now();
 			if (PaddleDirection > 0)
 				send("paddle move +");
 			if (PaddleDirection < 0)
-				send("paddle move -");
+                send("paddle move -");
+            var currentLeft = Number(playerPaddle.style.left.slice(0,-2));
+            var currentTop = Number(playerPaddle.style.top.slice(0,-2));
+
+            console.log(currentLeft);
+            ////For reference: 
+            ////the boundaries used in the PhysicsEngine
+            ///////xMin, yMin, xMax, yMax
+            ///////  94,  177,  494,  577
+
+            ///Extrapolation?
+            /*
+            if ((playerPaddle == document.getElementById('top-paddle') ||
+                playerPaddle == document.getElementById('bottom-paddle')) &&
+                (currentLeft + PaddleDirection >= 94) && (currentLeft + PaddleDirection + 100 <= 504) ) {
+                playerPaddle.style.left = (currentLeft + PaddleDirection) + 'px';
+            }
+            if ((playerPaddle == document.getElementById('left-paddle') ||
+                playerPaddle == document.getElementById('right-paddle')) &&
+                (currentLeft + PaddleDirection >= 177) && (currentLeft + PaddleDirection + 100 <= 577) ) {
+                playerPaddle.style.top = (currentLeft + PaddleDirection) + 'px';
+            }*/
 		}
 
-		function movePlayerPaddle(e){
+        function movePlayerPaddle(e) {
+            var speed = 50; ///for the interval, the larger the slower
+            var movement = 10; //20?
 			switch (e.code){
 				case 'ArrowUp':
 					if (!PaddleTimer){
-						PaddleDirection = -10;
-						PaddleTimer = setInterval(movePaddle, 50);
+						PaddleDirection = -1 * movement;
+						PaddleTimer = setInterval(movePaddle, speed);
 					}
 					break;
 				case 'ArrowRight':
 					if (!PaddleTimer){
-						PaddleDirection = 10;
-						PaddleTimer = setInterval(movePaddle, 50);
+						PaddleDirection = movement;
+						PaddleTimer = setInterval(movePaddle, speed);
 					}
 					break;
 				case 'ArrowDown':
 					if (!PaddleTimer){
-						PaddleDirection = 10;
-						PaddleTimer = setInterval(movePaddle, 50);
+						PaddleDirection = movement;
+						PaddleTimer = setInterval(movePaddle, speed);
 					}
 					break;
 				case 'ArrowLeft':
 					if (!PaddleTimer){
-						PaddleDirection = -10;
-						PaddleTimer = setInterval(movePaddle, 50);
+						PaddleDirection = -1 * movement;
+						PaddleTimer = setInterval(movePaddle, speed);
 					}
 					break;
 			}
