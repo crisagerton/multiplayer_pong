@@ -24,7 +24,7 @@ vector<pair<int, string>> latencyQueueSent; //stores timestamp (int) and message
 vector<tuple<int, int, string>> latencyQueueReceived; //stores timestamp (int), clientID (int) and message to be processed (string)
 int latency = 500;
 int minLatency = 0;
-int maxLatency = 2000;
+int maxLatency = 600;
 int incrementBy = 1;
 string latencyType; //"fixed", "random", or "incremental"
 

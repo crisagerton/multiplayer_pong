@@ -280,16 +280,60 @@
             console.log("Ori: " + originalPosIntLeft);
             console.log("Next: " + nextPosIntLeft);
 
+            var i = 0;
+            var difference = nextPosIntLeft - originalPosIntLeft;
+            
+            if (difference != 0) {
+                var updates = difference / 10;
+                var increment;
+                if (difference < 0) {
+                    increment = -10;
+                }
+                else {
+                    increment = 10;
+                }
+                var limit = 15 * (difference);
+
+                var mover = setInterval(movePaddleCoordinates(paddle, increment), 15);
+                setTimeout(clearInterval(mover), limit);
+                //paddle.style.left = nextPosIntLeft + 'px';
+            }
+
+            /*
             for (var i = 0; i < 1; i += 0.1) {
+
                 var newPosLeft = '' + (originalPosIntLeft + i * (nextPosIntLeft - originalPosIntLeft));
                 var newPosTop = '' + (originalPosIntTop + i * (nextPosIntTop - originalPosIntTop));
 
-                paddle.style.left = newPosLeft + 'px';
-                paddle.style.top = newPosTop + 'px';
+                //var newleft = originalPosIntLeft + i;
+                //var newtop = originalPosIntTop;
 
-                console.log('After: ' + paddle.style.left);
+
+                setTimeout(movePaddleCoordinates(paddle, newPosLeft, newPosTop), 25);
+
+                //paddle.style.left = newPosLeft + 'px';
+                //paddle.style.top = newPosTop + 'px';
+
+                //console.log('After: ' + paddle.style.left);
                 //console.log('After: ' + paddle.style.top);
             }
+            */
+        }
+
+        function movePaddleCoordinates(paddle, increment) {
+            /*
+            paddle.style.left = newleft + 'px';
+            paddle.style.top = newtop + 'px';
+            */
+            var originalPosIntLeft = Number(paddle.style.left.substring(0, paddle.style.left.length - 2));
+            //var originalPosIntTop = Number(paddle.style.top.substring(0, paddle.style.top.length - 2));
+
+            var newleft = originalPosIntLeft + increment;
+
+            paddle.style.left = newleft + 'px';
+            //paddle.style.top = newtop + 'px';
+
+            console.log('After: ' + paddle.style.left);
         }
 
         function checkNewPacket(lastPacketProcessed) {
