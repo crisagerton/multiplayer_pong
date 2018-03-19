@@ -216,9 +216,9 @@ void periodicHandler() {
 		}
 		for (int i = 0; i < latencyQueueReceived.size(); i++) {
 			if (get<0>(latencyQueueReceived[i]) <= systemTime) {
-				for (int j = 0; j < clientIDs.size(); j++) {
-					processMessageFromClient(get<2>(latencyQueueReceived[i]), get<1>(latencyQueueReceived[i]));
-				}
+				
+				processMessageFromClient(get<2>(latencyQueueReceived[i]), get<1>(latencyQueueReceived[i]));
+				
 				latencyQueueReceived.erase(latencyQueueReceived.begin() + i);
 			}
 		}
@@ -231,8 +231,8 @@ int main(int argc, char *argv[]) {
 	/* Setting latency: 
 	uncomment one and comment the others
 	to test different types of latency*/
-	latencyType = "fixed";
-	//latencyType = "random";
+	//latencyType = "fixed";
+	latencyType = "random";
 	//latencyType = "incremental"; latency = minLatency;
 
 	/* set ports */

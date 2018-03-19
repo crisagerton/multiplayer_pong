@@ -241,23 +241,73 @@
                 return;
             }*/
 
-            console.log("Last Processed: " + lastPaddlePacketProcessed);
-            console.log("Processing..." + receivedPacket);
-            if (!checkNewPacket(lastPaddlePacketProcessed)) {
-                console.log("Packet " + receivedPacket + " not processed");
-                return;
-            }
-            console.log("Packet " + receivedPacket + " processed");
+    		var paddlePosLeft = Number(paddle.style.left.substring(0, paddle.style.left.length - 2));
+    		var playerPosLeft = Number(playerPaddle.style.left.substring(0, paddle.style.left.length - 2));
 
-            //Interpolation to smooth it out
-            interpolate(paddle, splitCommand);
+    		var distanceLeft;
+    		if (playerPosLeft > paddlePosLeft) {
+    		    distanceLeft = (playerPosLeft - paddlePosLeft > 2);
+    		} else {
+    		    distanceLeft = (paddlePosLeft - playerPosLeft > 2);
+    		}
 
-            ////From the older version
-    		//paddle.style.left = splitCommand[2] + 'px';
-            //paddle.style.top = splitCommand[3] + 'px';
+    		var paddlePosTop = Number(paddle.style.top.substring(0, paddle.style.top.length - 2));
+    		var playerPosTop = Number(playerPaddle.style.top.substring(0, paddle.style.top.length - 2));
+
+    		var distanceTop;
+    		if (playerPosTop > paddlePosTop) {
+    		    distanceTop = (playerPosTop - paddlePosTop > 2);
+    		} else {
+    		    distanceTop = (paddlePosTop - playerPosTop > 2);
+    		}
+
+    		if (distanceLeft && paddle == playerPaddle && playerPaddle.style.left != splitCommand[2] + 'px') {
+    		    playerPaddle.style.left = splitCommand[2] + 'px';
+    		}
+
+    		if (distanceTop && paddle == playerPaddle && playerPaddle.style.top != splitCommand[3] + 'px') {
+    		    playerPaddle.style.top = splitCommand[3] + 'px';
+    		}
+
+    		if (commandForPlayerPaddle(splitCommand[1]) &&
+                Number(playerPaddle.style.left.slice(0, -2)) != 0) { //&&
+    		    //Number(playerPaddle.style.top.slice(0, -2)) != 0) {
+    		    //console.log("Not Processed");
+    		    return;
+    		}
+
+    	    //console.log("Last Processed: " + lastPaddlePacketProcessed);
+    	    //console.log("Processing..." + receivedPacket);
+    		if (!checkNewPacket(lastPaddlePacketProcessed)) {
+    		    //console.log("Packet " + receivedPacket + " not processed");
+    		    return;
+    		}
+    	    //console.log("Packet " + receivedPacket + " processed");
+
+
+    	    //Interpolation to smooth it out
+            /*
+    		if (splitCommand[1] == "t" && playerPaddle != document.getElementById('top-paddle')) {
+    		    interpolate(paddle, splitCommand);
+    		}
+    		else if (splitCommand[1] == "l" && playerPaddle != document.getElementById('left-paddle')) {
+    		    interpolate(paddle, splitCommand);
+    		}
+    		else if (splitCommand[1] == "r" && playerPaddle != document.getElementById('right-paddle')) {
+    		    interpolate(paddle, splitCommand);
+    		}
+    		else if (splitCommand[1] == "b" && playerPaddle != document.getElementById('bottom-paddle')) {
+    		    interpolate(paddle, splitCommand);
+    		}
+            */
+    		interpolate(paddle, splitCommand);
+
+    	    ////From the older version
+    	    //paddle.style.left = splitCommand[2] + 'px';
+    	    //paddle.style.top = splitCommand[3] + 'px';
 
     	    //Updating packets
-            lastPaddlePacketProcessed = receivedPacket;
+    		lastPaddlePacketProcessed = receivedPacket;
             
         }
 
@@ -294,12 +344,13 @@
                 else {
                     increment = 10;
                 }
-                var limit = 2.5 * (updates);
+                var limit = 2.5 * (updates + 1);
 
                 var mover = setInterval(movePaddleCoordinates(paddle, increment, 0), 2.5);
-                setTimeout(endInterpolate(mover, paddle, nextPosIntLeft), limit);
+                setTimeout(endInterpolate(mover, paddle, nextPosIntLeft, nextPosIntTop), limit);
                 //setTimeout(clearInterval(mover), limit);
-                //paddle.style.left = nextPosIntLeft + 'px';
+                paddle.style.left = nextPosIntLeft + 'px';
+                paddle.style.top = nextPosIntTop + 'px';
             }
             if (differenceTop != 0) {
                 var updates = differenceTop / 10;
@@ -310,12 +361,13 @@
                 else {
                     increment = 10;
                 }
-                var limit = 2.5 * (updates);
+                var limit = 2.5 * (updates + 1);
 
                 var mover = setInterval(movePaddleCoordinates(paddle, 0, increment), 2.5);
-                setTimeout(endInterpolate(mover, paddle, nextPosIntTop), limit);
+                setTimeout(endInterpolate(mover, paddle, nextPosIntLeft, nextPosIntTop), limit);
                 //setTimeout(clearInterval(mover), limit);
                 //paddle.style.left = nextPosIntLeft + 'px';
+               // paddle.style.top = nextPosIntTop + 'px';
             }
         }
 
@@ -333,9 +385,10 @@
             console.log('After: ' + paddle.style.left);
         }
 
-        function endInterpolate(mover, paddle, newpos) {
+        function endInterpolate(mover, paddle, newposL, newposT) {
             clearInterval(mover);
-            //paddle.style.left = newpos + 'px';
+            paddle.style.left = newposL + 'px';
+            paddle.style.top = newposT + 'px';
         }
 
         function checkNewPacket(lastPacketProcessed) {
@@ -410,48 +463,41 @@
             ///////  94,  177,  494,  577
 
             ///Extrapolation?
-            /*
+            
+
             if ((playerPaddle == document.getElementById('top-paddle') ||
-                playerPaddle == document.getElementById('bottom-paddle')) &&
-                (currentLeft + PaddleDirection >= 94) && (currentLeft + PaddleDirection + 100 <= 504) ) {
+               playerPaddle == document.getElementById('bottom-paddle')) && currentLeft + PaddleDirection >= 94
+               && currentLeft + PaddleDirection + 100 <= 504) {
+
                 playerPaddle.style.left = (currentLeft + PaddleDirection) + 'px';
             }
             if ((playerPaddle == document.getElementById('left-paddle') ||
-                playerPaddle == document.getElementById('right-paddle')) &&
-                (currentLeft + PaddleDirection >= 177) && (currentLeft + PaddleDirection + 100 <= 577) ) {
-                playerPaddle.style.top = (currentLeft + PaddleDirection) + 'px';
-            }*/
+                playerPaddle == document.getElementById('right-paddle')) && currentTop + PaddleDirection >= 177
+                && currentTop + PaddleDirection + 100 <= 577) {
+
+                playerPaddle.style.top = (currentTop + PaddleDirection) + 'px';
+            }
 		}
 
         function movePlayerPaddle(e) {
-            var speed = 50; ///for the interval, the larger the slower
-            var movement = 10; //20?
-			switch (e.code){
-				case 'ArrowUp':
-					if (!PaddleTimer){
-						PaddleDirection = -1 * movement;
-						PaddleTimer = setInterval(movePaddle, speed);
-					}
-					break;
-				case 'ArrowRight':
-					if (!PaddleTimer){
-						PaddleDirection = movement;
-						PaddleTimer = setInterval(movePaddle, speed);
-					}
-					break;
-				case 'ArrowDown':
-					if (!PaddleTimer){
-						PaddleDirection = movement;
-						PaddleTimer = setInterval(movePaddle, speed);
-					}
-					break;
-				case 'ArrowLeft':
-					if (!PaddleTimer){
-						PaddleDirection = -1 * movement;
-						PaddleTimer = setInterval(movePaddle, speed);
-					}
-					break;
-			}
+            switch (e.code) {
+                case 'ArrowUp':
+                    PaddleDirection = -10;
+                    movePaddle();
+                    break;
+                case 'ArrowRight':
+                    PaddleDirection = 10;
+                    movePaddle();
+                    break;
+                case 'ArrowDown':
+                    PaddleDirection = 10;
+                    movePaddle();
+                    break;
+                case 'ArrowLeft':
+                    PaddleDirection = -10;
+                    movePaddle();
+                    break;
+            }
 		}
 
 		function stopPlayerPaddle(e){
@@ -460,7 +506,6 @@
 				case 'ArrowDown':
 				case 'ArrowRight':
 				case 'ArrowLeft':
-					clearInterval(PaddleTimer);
 					PaddleTimer = null;
 					send("paddle stop"); //paddle stop code
 					break;
