@@ -22,9 +22,9 @@ int interval_clocks = CLOCKS_PER_SEC * INTERVAL_MS / 1000;
 //Latency variables
 vector<pair<int, string>> latencyQueueSent; //stores timestamp (int) and message to be processed (string)
 vector<tuple<int, int, string>> latencyQueueReceived; //stores timestamp (int), clientID (int) and message to be processed (string)
-int latency = 500;
+int latency = 100;
 int minLatency = 0;
-int maxLatency = 600;
+int maxLatency = 200;
 int incrementBy = 1;
 string latencyType; //"fixed", "random", or "incremental"
 
@@ -231,8 +231,8 @@ int main(int argc, char *argv[]) {
 	/* Setting latency: 
 	uncomment one and comment the others
 	to test different types of latency*/
-	//latencyType = "fixed";
-	latencyType = "random";
+	latencyType = "fixed";
+	//latencyType = "random";
 	//latencyType = "incremental"; latency = minLatency;
 
 	/* set ports */
